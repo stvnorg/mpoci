@@ -3,7 +3,8 @@ create table members (
     id integer primary key autoincrement,
     name text not null,
     username text not null,
-    password text not null
+    password text not null,
+    time_date_added text not null
 );
     
 drop table if exists activity;
@@ -17,7 +18,8 @@ create table activity (
     notes text not null,
     admin_response text not null,
     merge_status text not null,
-    revert_status text not null
+    revert_status text not null,
+    review_status text not null
 );
 
 drop table if exists latest_merge;

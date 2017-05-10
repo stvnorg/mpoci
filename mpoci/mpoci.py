@@ -59,12 +59,19 @@ def main_page():
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     error = None
+    user_cookies = request.cookies.get('username')
+    if user_cookies:
+        return redirect(url_for('main_page'))
+
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        return username + ' ' + password
+        if error:
+            return render_template('login.html', error=error)
+        else:
+            return redirect(url_for('main_page'))
     else:
-        return render_template('login.html')
+        return render_template('login.html', error=error)
 
 @app.route('/new_member', methods=['POST', 'GET'])
 def new_member():
