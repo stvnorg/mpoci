@@ -14,7 +14,15 @@
       <p class="message">Already registered? <a href="#">Sign In</a></p>
     </form>
     <form class="new-member-form" action="../new_member" method="POST">
-      <label for="title-form">Add New Member</label>
+      <label for="title-form">Register New Member</label>
+      <div class="access-level">
+      <label for="access-level">Access Level:</label>
+      <select>
+        <option value="">--</option>
+        <option value="admin">Admin</option>
+        <option value="user">User</option>
+      </select>
+      </div>
       <input type="text" placeholder="Fullname" name="fullname" value="{{ request.form.fullname }}" />
       <input type="text" placeholder="Username" name="username" value="{{ request.form.username }}" />
       <input type="text" placeholder="Password" name="password" value="{{ request.form.password }}" />

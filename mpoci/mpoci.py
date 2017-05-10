@@ -1,9 +1,13 @@
 import os
 import sqlite3
+from Crypto.Cipher import AES
+import base64
+from datetime import datetime
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 
 app = Flask(__name__)   # create the application instance :)
 app.config.from_object(__name__)    # load config from this file, mpoci.py
+app.secret_key = '\x9c\xe7\xd3\xbe>\xb3\x85M8\xa3\x93nB\xb3\x17\xa7tA\xae\x9fx\xa5\xf0\xfc'
 
 #Load default config and override config from an environment variable
 app.config.update(dict(
@@ -46,26 +50,52 @@ def initdb_command():
     """Initializes the database. """
     init_db()
     print('Initialized the database.')
+
 """ initdb END OF FUNCTION """
+
+"""PASSWORD ENCRYPTION/DECRYPTION FUNCTION"""
+
+def encryptPass(password):
+    secret_key = '3dF6htKPLjVoKnze'
+    iv = 'wJGqH5sYCSam47cE'
+    cipher = AES.new(secret_key,AES.MODE_CBC,iv)
+    encoded = cipher.encrypt(password.rjust(32))
+    return encoded
+
+def decryptPass(password):
+    secret_key = '3dF6htKPLjVoKnze'
+    iv = 'wJGqH5sYCSam47cE'
+    cipher = AES.new(secret_key,AES.MODE_CBC,iv)
+    decoded = cipher.decrypt(password)
+    return decoded.strip()
+
+""" END OF LINE """
 
 @app.route('/')
 def main_page():
-    username = request.cookies.get('username')
-    if not username:
-        return redirect(url_for('login'))
+    if len(session):
+        if 'username' in session.keys():
+            username = session['username']
+            return 'Hi ' + username
+        else:
+            return redirect(url_for('login'))
     else:
-        return 'Main Page'
+        return redirect(url_for('login'))
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     error = None
-    user_cookies = request.cookies.get('username')
-    if user_cookies:
+    if len(session):
         return redirect(url_for('main_page'))
+    #else:
+    #    return render_template('login.html', error=error)
 
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        if username=='admin' and password == 'default':
+           session['username'] = 'admin'
+           return redirect(url_for('main_page'))
         if error:
             return render_template('login.html', error=error)
         else:
@@ -73,13 +103,47 @@ def login():
     else:
         return render_template('login.html', error=error)
 
+@app.route('/logout')
+def logout():
+    if len(session):
+        username = session['username']
+        flag = request.args.get('flag')
+        try:
+            if int(flag)==1:
+                session.pop('username', None)
+                return redirect(url_for('login'))
+            else:
+                return redirect(url_for('main_page'))
+        except:
+            return redirect(url_for('main_page'))
+    else:
+        return redirect(url_for('login'))
+
 @app.route('/new_member', methods=['POST', 'GET'])
 def new_member():
+    if len(session):
+        if 'username' in session.keys():
+            username = session['username']
+            
+        else:
+            return redirect(url_for('login'))
+    else:
+        return redirect(url_for('login'))    
+
     if request.method == 'POST':
-        name = request.form['fullname']
+        fullname = request.form['fullname']
         username = request.form['username']
-        password = request.form['password']
-        return ",".join[name,username,password]
+        password = encryptPass(request.form['password'])
+        
+        if fullname and username and password:
+            db = get_db()
+            db.text_factory = str
+            db.execute("insert into members (name, username, password, level, time_date_added) values (?, ?, ?, ?, datetime('now'))",
+                        [fullname, username, password, level])
+            db.commit()
+            return redirect(url_for('main_page'))
+        else:
+            return "Data not complete"
     else:
         return render_template('new_member.html')
 

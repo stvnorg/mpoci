@@ -4,6 +4,7 @@ create table members (
     name text not null,
     username text not null,
     password text not null,
+    level text not null,
     time_date_added text not null
 );
     

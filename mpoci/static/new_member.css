@@ -12,6 +12,16 @@ label[for="title-form"] {
   font-weight: bold;  
   color: #333;
 }
+.access-level {
+  width: 100%;
+  text-align: left;
+  padding: 0 0 5% 0;
+}
+label[for="access-level"] {
+  display: block-inline;
+  font-size: 0.8em;
+  color: #111;
+}
 .form {
   position: relative;
   z-index: 1;
