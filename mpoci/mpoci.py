@@ -32,6 +32,14 @@ def get_db():
         g.sqlite_db = connect_db()
     return g.sqlite_db
 
+def query_db(query, args=(), one=False):
+    db = get_db()
+    db.text_factory = str
+    cur = db.execute(query, args)
+    rv = cur.fetchall()
+    cur.close()
+    return (rv[0] if rv else None) if one else rv
+
 @app.teardown_appcontext
 def close_db(error):
     """Closes the database again at the end of the request."""
@@ -85,23 +93,22 @@ def main_page():
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     error = None
-    if len(session):
-        return redirect(url_for('main_page'))
-    #else:
-    #    return render_template('login.html', error=error)
-
+    
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        if username=='admin' and password == 'default':
-           session['username'] = 'admin'
-           return redirect(url_for('main_page'))
-        if error:
-            return render_template('login.html', error=error)
+        user = query_db("select username,password,level from members where username = ? and password = ?", [username,encryptPass(password)], one=True)
+        if user == None:
+            return "ERROR"
+            return render_template('login.html', error="Wrong username/password")
         else:
-            return redirect(url_for('main_page'))
+           session['username'] = username
+           return redirect(url_for('main_page'))
     else:
-        return render_template('login.html', error=error)
+        if len(session) and 'username' in session.keys():
+            return redirect(url_for('main_page'))
+        else:
+            return render_template('login.html', error=error)
 
 @app.route('/logout')
 def logout():
@@ -121,10 +128,14 @@ def logout():
 
 @app.route('/new_member', methods=['POST', 'GET'])
 def new_member():
+    db = get_db()
+    db.text_factory = str
     if len(session):
         if 'username' in session.keys():
             username = session['username']
-            
+            access = query_db('select level from members where username=?', [username], one=True)
+            if access['level']!='admin':
+                return redirect(url_for('main_page'))
         else:
             return redirect(url_for('login'))
     else:
@@ -133,13 +144,12 @@ def new_member():
     if request.method == 'POST':
         fullname = request.form['fullname']
         username = request.form['username']
-        password = encryptPass(request.form['password'])
-        
-        if fullname and username and password:
-            db = get_db()
-            db.text_factory = str
+        password = request.form['password']
+        access_level = request.form['access-level']
+        if fullname and username and password and access_level:
+            password = encryptPass(password)
             db.execute("insert into members (name, username, password, level, time_date_added) values (?, ?, ?, ?, datetime('now'))",
-                        [fullname, username, password, level])
+                        [fullname, username, password, access_level])
             db.commit()
             return redirect(url_for('main_page'))
         else:
