@@ -128,6 +128,7 @@ def logout():
 def new_member():
     db = get_db()
     db.text_factory = str
+    error = None
     if len(session):
         if 'username' in session.keys():
             username = session['username']
@@ -144,16 +145,26 @@ def new_member():
         username = request.form['username']
         password = request.form['password']
         access_level = request.form['access-level']
+
+        def checkNewMember(username):
+            query = query_db("select username from members where username = ?", [username])
+            return len(query)
+
         if fullname and username and password and access_level:
             password = encryptPass(password)
+
+            if checkNewMember(username):
+                return render_template('new_member.html', error="* Username already exist!")
+
             db.execute("insert into members (name, username, password, level, time_date_added) values (?, ?, ?, ?, datetime('now'))",
                         [fullname, username, password, access_level])
             db.commit()
             return redirect(url_for('main_page'))
         else:
-            return "Data not complete"
+            return render_template('new_member.html', error="* Some fields is empty!")
     else:
-        return render_template('new_member.html')
+        return render_template('new_member.html', error=error)
+
 
 if __name__ == '__main__':
     app.run()

@@ -26,8 +26,11 @@
       <input type="text" placeholder="Fullname" name="fullname" value="{{ request.form.fullname }}" />
       <input type="text" placeholder="Username" name="username" value="{{ request.form.username }}" />
       <input type="text" placeholder="Password" name="password" value="{{ request.form.password }}" />
+      {% if error %}
+        <p class="error">{{ error }}</p>
+      {% endif %}
       <button>Add Member</button>
-      
+
       <!-- Enable if it has feature for a user to requesting admin to create a username/password -->
       <!-- <p class="message">Not registered? <a href="#">Create an account</a></p> -->
       <!-- COMMENT END OF LINE -->
