@@ -93,7 +93,7 @@ def login():
     error = None
 
     if request.method == 'POST':
-        username = request.form['username']
+        username = (request.form['username']).lower()
         password = request.form['password']
         user = query_db("select username,password,level from members where username = ? and password = ?", [username,encryptPass(password)], one=True)
         if user == None:
@@ -124,6 +124,21 @@ def logout():
     else:
         return redirect(url_for('login'))
 
+@app.route('/restore')
+def restore():
+    query = query_db("select username from members where username = ?", ['mpociAdmin'])
+    if len(query):
+        return "Nothing to restore"
+    else:
+        db = get_db()
+        db.text_factory = str
+        password = encryptPass('rahasia')
+        db.execute("insert into members (name, username, password, level, time_date_added) values (?, ?, ?, ?, datetime('now'))",
+                ['Super Admin', 'mpociadmin', password, 'admin'])
+        db.commit()
+        db.close()
+        return "Restore Success!"
+
 @app.route('/new_member', methods=['POST', 'GET'])
 def new_member():
     db = get_db()
@@ -142,7 +157,7 @@ def new_member():
 
     if request.method == 'POST':
         fullname = request.form['fullname']
-        username = request.form['username']
+        username = (request.form['username']).lower()
         password = request.form['password']
         access_level = request.form['access-level']
 
