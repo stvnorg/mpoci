@@ -168,7 +168,7 @@ def new_member():
 @app.route('/edit_member', methods=['POST', 'GET'])
 def edit_member():
     members = None
-    query = query_db('select * from members order by id asc')
+    query = query_db('select * from members order by level asc')
 
     if len(session):
         if 'username' in session.keys():
@@ -183,6 +183,7 @@ def edit_member():
 
     if request.method == 'GET':
         try:
+            message = None
             edit_flag = request.args.get('edit')
             edit_username = request.args.get('username')
             db = get_db()
@@ -192,13 +193,15 @@ def edit_member():
                 new_level = 'user' if current_access['level']=='admin' else 'admin'
                 db.execute('update members set level = ? where username = ?', [new_level, edit_username])
                 db.commit()
+                message = "Update Success!"
             elif edit_flag == '0':
                 db.execute('delete from members where username = ?', [edit_username])
                 db.commit()
+                message = "Delete Success!"
             else:
                 return render_template('edit_member.html', members=query)
             db.close()
-            return render_template('edit_member.html', members=query)
+            return redirect(url_for('edit_member'))
         except:
             return render_template('edit_member.html', members=query)
     else:

@@ -2,6 +2,14 @@
 <head>
     <title>QQDewa Continous Integration - Add New Member</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='edit_member.css') }}" />
+    <script type="text/javascript">
+      function confirmDelete(delURL) {
+        if (confirm("Are you sure want to delete?")) {
+          document.location = delURL;
+        }
+      }
+    </script>
+
 </head>
 <body>
 <div class="form">
@@ -12,7 +20,8 @@
       <th>No.</th>
       <th>Name</th>
       <th>Username</th>
-      <th colspan="3"></th>
+      <th>Access</th>
+      <th colspan="2"></th>
     </tr>
     {% set number = [1] %}
     {% for member in members %}
@@ -21,18 +30,13 @@
       {% if number.append(number.pop()+1) %}{% endif %}
       <td>{{ member.name }}</td>
       <td>{{ member.username }}</td>
-      <td>Access:
-        <select name="access-level">
-          <option value="">--</option>
-          <option value="admin">Admin</option>
-          <option value="user">User</option>
-        </select>
-      </td>
-      <td><button><a href="../edit_member?edit=1&username={{ member.username }}" class="edit-link">Change</a></button></td>
-      <td><button class="delete-button"><a href="" class="delete-link">Delete</a></button></td>
+      <td>{{ member.level }}</td>
+      <td><button><a href="../edit_member?edit=1&username={{ member.username }}" class="edit-link">Switch</a></button></td>
+      <td><button class="delete-button"><a href="javascript:confirmDelete('../edit_member?edit=0&username={{ member.username }}')" class="delete-link" id="delete-link">Delete</a></button></td>
     </tr>
     {% endfor %}
   </table>
+
   </form>
 </div>
 </body>
