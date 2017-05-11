@@ -165,6 +165,44 @@ def new_member():
     else:
         return render_template('new_member.html', error=error)
 
+@app.route('/edit_member', methods=['POST', 'GET'])
+def edit_member():
+    members = None
+    query = query_db('select * from members order by id asc')
+
+    if len(session):
+        if 'username' in session.keys():
+            username = session['username']
+            access = query_db('select level from members where username=?', [username], one=True)
+            if access['level']!='admin':
+                return redirect(url_for('main_page'))
+        else:
+            return redirect(url_for('login'))
+    else:
+        return redirect(url_for('login'))
+
+    if request.method == 'GET':
+        try:
+            edit_flag = request.args.get('edit')
+            edit_username = request.args.get('username')
+            db = get_db()
+            db.text_factory = str
+            if edit_flag == '1':
+                current_access = query_db('select level from members where username = ?', [edit_username], one=True)
+                new_level = 'user' if current_access['level']=='admin' else 'admin'
+                db.execute('update members set level = ? where username = ?', [new_level, edit_username])
+                db.commit()
+            elif edit_flag == '0':
+                db.execute('delete from members where username = ?', [edit_username])
+                db.commit()
+            else:
+                return render_template('edit_member.html', members=query)
+            db.close()
+            return render_template('edit_member.html', members=query)
+        except:
+            return render_template('edit_member.html', members=query)
+    else:
+        return "TEST"
 
 if __name__ == '__main__':
     app.run()
