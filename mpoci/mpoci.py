@@ -1,8 +1,6 @@
 import os
 import sqlite3
 from Crypto.Cipher import AES
-import base64
-from datetime import datetime
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 
 app = Flask(__name__)   # create the application instance :)
@@ -93,7 +91,7 @@ def main_page():
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     error = None
-    
+
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -139,7 +137,7 @@ def new_member():
         else:
             return redirect(url_for('login'))
     else:
-        return redirect(url_for('login'))    
+        return redirect(url_for('login'))
 
     if request.method == 'POST':
         fullname = request.form['fullname']
@@ -159,4 +157,3 @@ def new_member():
 
 if __name__ == '__main__':
     app.run()
-
