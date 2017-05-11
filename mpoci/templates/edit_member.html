@@ -32,8 +32,8 @@
         <td>{{ member.name }}</td>
         <td>{{ member.username }}</td>
         <td>{{ member.level }}</td>
-        <td><button><a href="../edit_member?edit=1&username={{ member.username }}" class="edit-link">Switch</a></button></td>
-        <td><button class="delete-button"><a href="javascript:confirmDelete('../edit_member?edit=0&username={{ member.username }}', '{{ member.username }}')" class="delete-link" id="delete-link">Delete</a></button></td>
+        <td><a href="../edit_member?edit=1&username={{ member.username }}" class="edit-link">Switch</a></td>
+        <td><a href="javascript:confirmDelete('../edit_member?edit=0&username={{ member.username }}', '{{ member.username }}')" class="delete-link" id="delete-link">Delete</a></td>
       </tr>
       {% endif %}
     {% endfor %}

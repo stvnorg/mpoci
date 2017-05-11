@@ -65,11 +65,17 @@ label[for="access-level"] {
   cursor: pointer;
 }
 a.edit-link, a.edit-link:visited {
+  display: block;
+  padding: 5px;
   color: #e8e3e4;
+  background: #76b852;
 }
 
 a.delete-link, a.delete-link:visited {
+  display: block;
   color: #720a1e;
+  padding: 5px;
+  background: #76b852;
 }
 .form button:hover,.form button:active,.form button:focus {
   background: #43A047;
