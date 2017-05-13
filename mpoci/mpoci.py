@@ -2,10 +2,14 @@ import os
 import sqlite3
 from Crypto.Cipher import AES
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
+from werkzeug.utils import secure_filename
+
+UPLOAD_FOLDER = '/home/steven/mpoci/mpoci_data'
 
 app = Flask(__name__)   # create the application instance :)
 app.config.from_object(__name__)    # load config from this file, mpoci.py
 app.secret_key = '\x9c\xe7\xd3\xbe>\xb3\x85M8\xa3\x93nB\xb3\x17\xa7tA\xae\x9fx\xa5\xf0\xfc'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 #Load default config and override config from an environment variable
 app.config.update(dict(
@@ -217,10 +221,31 @@ def edit_member():
 
 @app.route('/add_project', methods=['GET','POST'])
 def add_project():
+    error = None
     if not checkLogin():
         return redirect(url_for('main_page'))
-        
-    return render_template('add_project.html')
+
+    if request.method == 'POST':
+        # check if the post request has the file part
+        if 'files[]' not in request.files:
+            return render_template('add_project.html', error="No folder selected!")
+        #files = request.files['files[]']
+        files = request.files.getlist('files[]', None)
+        trees = []
+        for i in files:
+            trees.append(i.filename)
+        return str(trees)
+        # if user does not select file, browser also submit an empty part without filename
+        if not files:
+            return render_template('add_project.html', error="No folder selected!")
+        if files:
+            filename = secure_filename(files.filename)
+            folder = str(files.filename)
+            folder = folder.split('/')
+            #return (folder[0])
+            files.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            return redirect(url_for('main_page'))
+    return render_template('add_project.html', error=error)
 
 if __name__ == '__main__':
     app.run()

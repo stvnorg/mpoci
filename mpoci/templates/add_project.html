@@ -2,16 +2,29 @@
 <head>
     <title>QQDewa Continous Integration - Add New Project</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='add_project.css') }}" />
+    <script>
+      function selectFolder(e) {
+        for (var i=0; i < e.target.files.length; i++) {
+          var s = e.target.files[i].name + '\n';
+          s += e.target.files[i].size + 'Bytes\n';
+          s += e.target.files[i].type;
+          alert(s);
+        }
+      }
+    </script>
 </head>
 <body>
 <div class="login-page">
   <div class="form">
-    <form class="new-member-form" action="../add_project" method="POST">
+    <form class="add-project-form" action="../add_project" method="POST" enctype="multipart/form-data">
       <label for="title-form">Add New Project</label>
       <div class="access-level">
       <label for="add-project">Project Name : </label>
       <input type="text" placeholder="" name="project_name" value="{{ request.form.project_name }}" /><br>
-      <button>Project Folder</button><br><br>
+      <label for="add-project">Project Folder : </label>
+      <input type="file" name="files[]" webkitdirectory mozdirectory odirectory msdirectory multiple="multiple"><br>
+      <!-- <input type="file" name="files[]" onchange="selectFolder(event)"; webkitdirectory mozdirectory odirectory msdirectory multiple="multiple"><br> -->
+      <!-- <input type="file" name="files[]" multiple=""><br> -->
       <label for="add-project">Description:</label><br>
       <textarea rows="4" cols="50"></textarea><br><br>
       <button>Submit</button>
