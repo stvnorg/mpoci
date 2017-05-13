@@ -1,4 +1,5 @@
 import os
+import re
 import sqlite3
 from Crypto.Cipher import AES
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
@@ -181,7 +182,7 @@ def new_member():
             db.commit()
             return redirect(url_for('main_page'))
         else:
-            return render_template('new_member.html', error="* Some fields is empty!")
+            return render_template('new_member.html', error="* Some fields are empty!")
     else:
         return render_template('new_member.html', error=error)
 
@@ -219,32 +220,37 @@ def edit_member():
     else:
         return "TEST"
 
+def checkProjectName(name):
+    result = re.search(r'\w+',name,re.M|re.I)
+    return len(result.group()) == len(name)
+
 @app.route('/add_project', methods=['GET','POST'])
 def add_project():
     error = None
+    files = None
     if not checkLogin():
         return redirect(url_for('main_page'))
 
     if request.method == 'POST':
         # check if the post request has the file part
-        if 'files[]' not in request.files:
-            return render_template('add_project.html', error="No folder selected!")
-        #files = request.files['files[]']
-        files = request.files.getlist('files[]', None)
-        trees = []
-        for i in files:
-            trees.append(i.filename)
-        return str(trees)
-        # if user does not select file, browser also submit an empty part without filename
-        if not files:
-            return render_template('add_project.html', error="No folder selected!")
-        if files:
-            filename = secure_filename(files.filename)
-            folder = str(files.filename)
-            folder = folder.split('/')
-            #return (folder[0])
-            files.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        project_name = request.form['project_name']
+        description = request.form['description']
+
+        if len(request.files.getlist('files[]'))==1 and (not project_name or not description):
+            return render_template('add_project.html', error="* Some fields are empty!")
+        elif len(request.files.getlist('files[]'))>1 and (not project_name or not description):
+            return render_template('add_project.html', error="* Some fields are empty!")
+        elif len(request.files.getlist('files[]'))==1 and (project_name or description):
+            return render_template('add_project.html', error="* No folder selected!")
+        elif len(request.files.getlist('files[]'))>1 and project_name and description:
+            if not checkProjectName(project_name):
+                return render_template('add_project.html', error="* Invalid Project Name!")
+            files = request.files.getlist('files[]', None)
+            filename = secure_filename(files[0].filename)
+            #return filename
+            files[0].save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             return redirect(url_for('main_page'))
+
     return render_template('add_project.html', error=error)
 
 if __name__ == '__main__':
