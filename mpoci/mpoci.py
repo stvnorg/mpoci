@@ -77,6 +77,14 @@ def decryptPass(password):
 
 """ END OF LINE """
 
+def checkLogin():
+    if len(session):
+        if 'username' in session.keys():
+            username = session['username']
+            access = query_db('select level from members where username=?', [username], one=True)
+            return access['level']=='admin'
+    return False
+
 @app.route('/')
 def main_page():
     if len(session):
@@ -144,16 +152,9 @@ def new_member():
     db = get_db()
     db.text_factory = str
     error = None
-    if len(session):
-        if 'username' in session.keys():
-            username = session['username']
-            access = query_db('select level from members where username=?', [username], one=True)
-            if access['level']!='admin':
-                return redirect(url_for('main_page'))
-        else:
-            return redirect(url_for('login'))
-    else:
-        return redirect(url_for('login'))
+
+    if not checkLogin():
+        return redirect(url_for('main_page'))
 
     if request.method == 'POST':
         fullname = request.form['fullname']
@@ -185,16 +186,8 @@ def edit_member():
     members = None
     query = query_db('select * from members order by level asc')
 
-    if len(session):
-        if 'username' in session.keys():
-            username = session['username']
-            access = query_db('select level from members where username=?', [username], one=True)
-            if access['level']!='admin':
-                return redirect(url_for('main_page'))
-        else:
-            return redirect(url_for('login'))
-    else:
-        return redirect(url_for('login'))
+    if not checkLogin():
+        return redirect(url_for('main_page'))
 
     if request.method == 'GET':
         try:
@@ -203,13 +196,13 @@ def edit_member():
             edit_username = request.args.get('username')
             db = get_db()
             db.text_factory = str
-            if edit_flag == '1':
+            if edit_flag == '1' and session['username']!=edit_username:
                 current_access = query_db('select level from members where username = ?', [edit_username], one=True)
                 new_level = 'user' if current_access['level']=='admin' else 'admin'
                 db.execute('update members set level = ? where username = ?', [new_level, edit_username])
                 db.commit()
                 message = "Update Success!"
-            elif edit_flag == '0':
+            elif edit_flag == '0' and session['username']!=edit_username:
                 db.execute('delete from members where username = ?', [edit_username])
                 db.commit()
                 message = "Delete Success!"
@@ -221,6 +214,13 @@ def edit_member():
             return render_template('edit_member.html', members=query)
     else:
         return "TEST"
+
+@app.route('/add_project', methods=['GET','POST'])
+def add_project():
+    if not checkLogin():
+        return redirect(url_for('main_page'))
+        
+    return render_template('add_project.html')
 
 if __name__ == '__main__':
     app.run()

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<head>
+    <title>QQDewa Continous Integration - Add New Project</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='add_project.css') }}" />
+</head>
+<body>
+<div class="login-page">
+  <div class="form">
+    <form class="new-member-form" action="../add_project" method="POST">
+      <label for="title-form">Add New Project</label>
+      <div class="access-level">
+      <label for="add-project">Project Name : </label>
+      <input type="text" placeholder="" name="project_name" value="{{ request.form.project_name }}" /><br>
+      <button>Project Folder</button><br><br>
+      <label for="add-project">Description:</label><br>
+      <textarea rows="4" cols="50"></textarea><br><br>
+      <button>Submit</button>
+      </div>
+      {% if error %}
+        <p class="error">{{ error }}</p>
+      {% endif %}
+
+    </form>
+  </div>
+</div>
+</body>
+</html>
