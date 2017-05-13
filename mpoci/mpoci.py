@@ -110,8 +110,7 @@ def login():
         password = request.form['password']
         user = query_db("select username,password,level from members where username = ? and password = ?", [username,encryptPass(password)], one=True)
         if user == None:
-            return "ERROR"
-            return render_template('login.html', error="Wrong username/password")
+            return render_template('login.html', error="Wrong username/password!")
         else:
            session['username'] = username
            return redirect(url_for('main_page'))

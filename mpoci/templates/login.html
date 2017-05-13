@@ -17,6 +17,9 @@
       <label for="title-form">QQDewa Continous Integration</label>
       <input type="text" placeholder="username" name="username" value="{{ request.form.username }}" />
       <input type="password" placeholder="password" name="password" value="{{ request.form.password }}" />
+      {% if error %}
+        <p class="error">{{ error }}</p>
+      {% endif %}
       <button>login</button>
 
       <!-- Enable if it has feature for a user to requesting admin to create a username/password -->
