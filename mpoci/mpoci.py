@@ -245,6 +245,17 @@ def add_project():
             if not projectNameValidation(project_name):
                 return render_template('add_project.html', error="* Invalid Project Name!")
             files = request.files.getlist('files[]', None)
+
+            # Insert details of projects in the database
+            db = get_db()
+            db.text_factory = str
+            created_by = session['username']
+            db.execute("insert into projects (project_name, description, created_by, created_at) values (?, ?, ?, datetime('now'))",
+                        [project_name, description, created_by])
+            db.commit()
+            db.close()
+            # End of insert project details
+
             # Start to uploading files
             for f in files:
                 fname = f.filename

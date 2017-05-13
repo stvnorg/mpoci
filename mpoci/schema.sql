@@ -7,7 +7,7 @@ create table members (
     level text not null,
     time_date_added text not null
 );
-    
+
 drop table if exists activity;
 create table activity (
     id integer primary key autoincrement,
@@ -30,4 +30,13 @@ create table latest_merge (
     branch_name text not null,
     username text not null,
     time_date text not null
-);    
+);
+
+drop table if exists projects;
+create table projects (
+  id integer primary key autoincrement,
+  project_name text not null,
+  description text not null,
+  created_by text not null,
+  created_at text not null
+);
