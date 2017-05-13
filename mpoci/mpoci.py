@@ -220,7 +220,7 @@ def edit_member():
     else:
         return "TEST"
 
-def checkProjectName(name):
+def projectNameValidation(name):
     result = re.search(r'\w+',name,re.M|re.I)
     return len(result.group()) == len(name)
 
@@ -243,12 +243,28 @@ def add_project():
         elif len(request.files.getlist('files[]'))==1 and (project_name or description):
             return render_template('add_project.html', error="* No folder selected!")
         elif len(request.files.getlist('files[]'))>1 and project_name and description:
-            if not checkProjectName(project_name):
+            if not projectNameValidation(project_name):
                 return render_template('add_project.html', error="* Invalid Project Name!")
             files = request.files.getlist('files[]', None)
-            filename = secure_filename(files[0].filename)
-            #return filename
-            files[0].save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            # Start to uploading files
+            for f in files:
+                fname = f.filename
+                fname = fname.split('/')
+                fname = [str(i) for i in fname]
+                if len(fname) == 1:
+                    f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(f.filename)))
+                else:
+                    fname[0] = project_name.lower()
+                    directoryTree = UPLOAD_FOLDER
+                    for directory in fname[:len(fname)-1]:
+                        directoryTree += '/' + directory
+                        if not os.path.isdir(directoryTree):
+                            os.mkdir(directoryTree)
+                    app.config['UPLOAD_FOLDER'] = directoryTree
+
+                    f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(fname[len(fname)-1])))
+            # End of files upload
+
             return redirect(url_for('main_page'))
 
     return render_template('add_project.html', error=error)
