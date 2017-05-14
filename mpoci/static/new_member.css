@@ -11,6 +11,7 @@ label[for="title-form"] {
   font-size: 1em;
   font-weight: bold;
   color: #333;
+  text-decoration: underline;
 }
 .access-level {
   width: 100%;

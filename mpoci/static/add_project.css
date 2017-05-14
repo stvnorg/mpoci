@@ -7,10 +7,14 @@
 }
 label[for="title-form"] {
   display: block;
-  padding: 0 0 5% 0;
+  padding: 3% 0 3% 0;
   font-size: 1em;
   font-weight: bold;
   color: #333;
+  width: 100%;
+  margin: 0 0 5% 0;
+  background: #ddd;
+  text-decoration: underline;
 }
 .access-level {
   width: 100%;

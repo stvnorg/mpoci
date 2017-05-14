@@ -271,7 +271,6 @@ def add_project():
                         if not os.path.isdir(directoryTree):
                             os.mkdir(directoryTree)
                     app.config['UPLOAD_FOLDER'] = directoryTree
-
                     f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(fname[len(fname)-1])))
             # End of files upload
 
