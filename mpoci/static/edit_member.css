@@ -37,7 +37,7 @@ label[for="access-level"] {
 .form {
   position: relative;
   z-index: 1;
-  background: #ccc;
+  background: #eee;
   max-width: 480px;
   margin: 50px auto 100px;
   padding: 45px;
@@ -71,10 +71,9 @@ label[for="access-level"] {
 a.edit-link, a.edit-link:visited {
   display: block;
   padding: 5px;
-  color: #e8e3e4;
+  color: #0067fa;
   background: #76b852;
 }
-
 a.delete-link, a.delete-link:visited {
   display: block;
   color: #720a1e;

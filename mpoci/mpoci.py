@@ -5,7 +5,7 @@ from Crypto.Cipher import AES
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 from werkzeug.utils import secure_filename
 
-UPLOAD_FOLDER = '/home/steven/mpoci/mpoci_data'
+UPLOAD_FOLDER = '/var/www/qqdewa.test/html'
 
 app = Flask(__name__)   # create the application instance :)
 app.config.from_object(__name__)    # load config from this file, mpoci.py
@@ -217,7 +217,7 @@ def edit_member():
         except:
             return render_template('edit_member.html', members=query)
     else:
-        return "TEST"
+        return render_template('edit_member.html', members=query)
 
 def projectNameValidation(name):
     result = re.search(r'\w+',name,re.M|re.I)
@@ -251,7 +251,7 @@ def add_project():
             db.text_factory = str
             created_by = session['username']
             db.execute("insert into projects (project_name, description, created_by, created_at) values (?, ?, ?, datetime('now'))",
-                        [project_name, description, created_by])
+                        [project_name.lower(), description, created_by])
             db.commit()
             db.close()
             # End of insert project details
@@ -277,6 +277,15 @@ def add_project():
             return redirect(url_for('main_page'))
 
     return render_template('add_project.html', error=error)
+
+@app.route('/update_project', methods=['GET', 'POST'])
+def update_project():
+    error = None
+    if len(session) and 'username' in session.keys():
+        project_names = query_db('select project_name from projects',[])
+        return render_template('update_project.html', error=error, project_names=project_names)
+    else:
+        return redirect(url_for('main_page'))
 
 if __name__ == '__main__':
     app.run()

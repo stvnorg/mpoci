@@ -1,6 +1,6 @@
 @import url(https://fonts.googleapis.com/css?family=Roboto:300);
 
-.login-page {
+.edit-member {
   width: 360px;
   padding: 8% 0 0;
   margin: auto;
@@ -19,9 +19,9 @@ label[for="title-form"] {
 .access-level {
   width: 100%;
   text-align: left;
-  padding: 7% 0 4% 0;
+  padding: 0 0 5% 0;
 }
-label[for="access-level"] {
+label[for="update-project"] {
   display: block-inline;
   font-size: 0.8em;
   color: #111;
@@ -37,9 +37,9 @@ label[for="access-level"] {
 .form {
   position: relative;
   z-index: 1;
-  background: #aaa;
-  max-width: 360px;
-  margin: 0 auto 100px;
+  background: #ccc;
+  max-width: 480px;
+  margin: 50px auto 100px;
   padding: 45px;
   text-align: center;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
@@ -48,26 +48,36 @@ label[for="access-level"] {
   font-family: "Roboto", sans-serif;
   outline: 0;
   background: #f2f2f2;
-  width: 100%;
   border: 0;
   margin: 0 0 15px;
-  padding: 15px;
+  padding: 5px;
   box-sizing: border-box;
   font-size: 14px;
 }
 .form button {
   font-family: "Roboto", sans-serif;
-  text-transform: uppercase;
   outline: 0;
   background: #4CAF50;
-  width: 100%;
   border: 0;
-  padding: 15px;
-  color: #FFFFFF;
+  padding: 10px;
+  color: #e8e3e4;
   font-size: 14px;
   -webkit-transition: all 0.3 ease;
   transition: all 0.3 ease;
   cursor: pointer;
+}
+a.edit-link, a.edit-link:visited {
+  display: block;
+  padding: 5px;
+  color: #e8e3e4;
+  background: #76b852;
+}
+
+a.delete-link, a.delete-link:visited {
+  display: block;
+  color: #720a1e;
+  padding: 5px;
+  background: #76b852;
 }
 .form button:hover,.form button:active,.form button:focus {
   background: #43A047;
@@ -117,6 +127,22 @@ label[for="access-level"] {
 .container .info span .fa {
   color: #EF3B3A;
 }
+.member-list {
+  border: 1px solid grey;
+  border-collapse: collapse;
+  font-size: 12px;
+  font-family: "Roboto", sans-serif;
+}
+.member-list th {
+  background-color: black;
+  color: white;
+  padding: 5px;
+}
+.member-list tr td {
+  border: 1px solid grey;
+  border-collapse: collapse;
+}
+
 body {
   background: #76b852; /* fallback for old browsers */
   background: -webkit-linear-gradient(right, #76b852, #8DC26F);
