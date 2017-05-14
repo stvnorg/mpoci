@@ -26,10 +26,11 @@ create table activity (
 drop table if exists latest_merge;
 create table latest_merge (
     id integer primary key autoincrement,
+    activity_id integer not null,
     project_name text not null,
     branch_name text not null,
-    username text not null,
-    time_date text not null
+    merged_by text not null,
+    merged_at text not null
 );
 
 drop table if exists projects;

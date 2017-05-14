@@ -1,4 +1,5 @@
 import os
+import shutil
 import re
 import sqlite3
 from Crypto.Cipher import AES
@@ -233,6 +234,7 @@ def add_project():
     if request.method == 'POST':
         # check if the post request has the file part
         project_name = request.form['project_name']
+        project_name = project_name.lower()
         description = request.form['description']
 
         if len(request.files.getlist('files[]'))==1 and (not project_name or not description):
@@ -251,28 +253,40 @@ def add_project():
             db.text_factory = str
             created_by = session['username']
             db.execute("insert into projects (project_name, description, created_by, created_at) values (?, ?, ?, datetime('now'))",
-                        [project_name.lower(), description, created_by])
+                        [project_name, description, created_by])
             db.commit()
             db.close()
             # End of insert project details
 
+            members = query_db('select username from members', [])
             # Start to uploading files
             for f in files:
                 fname = f.filename
                 fname = fname.split('/')
                 fname = [str(i) for i in fname]
                 if len(fname) == 1:
-                    f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(f.filename)))
+                    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER + '/' + project_name + '/' + member.username + '/'
+                    f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(fname[0])))
                 else:
-                    fname[0] = project_name.lower()
+                    fTree = [fname[0]] + ["master"] + fname[1:]
+                    fTree[0] = project_name
                     directoryTree = UPLOAD_FOLDER
-                    for directory in fname[:len(fname)-1]:
+                    for directory in fTree[:len(fTree)-1]:
                         directoryTree += '/' + directory
                         if not os.path.isdir(directoryTree):
                             os.mkdir(directoryTree)
                     app.config['UPLOAD_FOLDER'] = directoryTree
-                    f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(fname[len(fname)-1])))
+                    f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(fTree[len(fTree)-1])))
             # End of files upload
+
+            # Generate Branch Folders Project
+            src = UPLOAD_FOLDER + '/' + project_name + '/' + 'master'
+            for member in members:
+                if member['username'] != 'mpociadmin':
+                    dst = UPLOAD_FOLDER + '/' + project_name + '/' + 'branch-' + member['username']
+                    shutil.copytree(src,dst)
+                    shutil.copystat(src,dst)
+            # Generate folder End of Line
 
             return redirect(url_for('main_page'))
 
