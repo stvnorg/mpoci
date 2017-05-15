@@ -362,9 +362,16 @@ def update_project():
                         files_update_list.append(new_file)
                 else:
                     files_update_list.append(new_file)
+                files_update_list.sort()
                 # compare file end of line
 
-            return str(files_update_list)
+            if files_update_list:
+                db = get_db()
+                db.text_factory = str
+                db.execute("insert into activity (project_name, branch_name, files_list, updated_by, updated_at, notes, admin_response, merge_status, revert_status, review_status) values (?, ?, ?, ?, datetime('now'), ?, ?, ?, ?, ?)",
+                            [project_name, "branch-"+username, ";".join(files_update_list), username, notes, '-', 0, 0, 0])
+                db.commit()
+                db.close()
 
         return redirect(url_for('main_page'))
 

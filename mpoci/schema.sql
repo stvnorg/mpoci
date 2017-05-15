@@ -14,13 +14,13 @@ create table activity (
     project_name text not null,
     branch_name text not null,
     files_list text not null,
-    update_by text not null,
-    time_date text not null,
+    updated_by text not null,
+    updated_at text not null,
     notes text not null,
     admin_response text not null,
-    merge_status text not null,
-    revert_status text not null,
-    review_status text not null
+    merge_status integer not null,
+    revert_status integer not null,
+    review_status integer not null
 );
 
 drop table if exists latest_merge;
