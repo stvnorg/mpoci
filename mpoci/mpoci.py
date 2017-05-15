@@ -288,12 +288,12 @@ def add_project():
             # Generate Branch Folders Project
             src = UPLOAD_FOLDER + '/' + project_name + '/' + 'master'
             for member in members:
-                dst = UPLOAD_FOLDER + '/' + project_name + '/' + 'branch-' + member['username']
+                dst = UPLOAD_FOLDER + '/' + project_name + '/branch-' + member['username']
                 shutil.copytree(src,dst)
                 shutil.copystat(src,dst)
             # Generate folder End of Line
             return redirect(url_for('main_page'))
-            
+
     return render_template('add_project.html', error=error)
 
 @app.route('/update_project', methods=['GET', 'POST'])
@@ -302,6 +302,7 @@ def update_project():
     if not len(session) and 'username' not in session.keys():
         return redirect(url_for('main_page'))
 
+    username = session['username']
     project_names = query_db('select project_name from projects',[])
 
     if request.method == 'POST':
@@ -320,11 +321,35 @@ def update_project():
             if not projectNameValidation(project_name):
                 return render_template('update_project.html', error="* Invalid Project Name!", project_names=project_names)
 
+            src = UPLOAD_FOLDER + '/' + project_name + '/branch-' + username
+            dst = '/var/www/qqdewa.test/DATA_BACKUP/' + project_name + '/branch-' + username + '.bak'
+            try:
+                if os.path.isdir(dst):
+                    shutil.rmtree(dst)
+                shutil.copytree(src, dst)
+            except:
+                return 'ERROR SHUTIL'
+
             files = request.files.getlist('files[]', None)
-            file_list = []
             for f in files:
-                file_list.append(f.filename)
-            return str(file_list)
+                fname = f.filename
+                fname = fname.split('/')
+                fname = [str(i) for i in fname]
+                if len(fname) == 1:
+                    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER + '/' + project_name + '/' + member.username + '/'
+                    f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(fname[0])))
+                else:
+                    fTree = [fname[0]] + ["branch-" + username] + fname[1:]
+                    fTree[0] = project_name
+                    directoryTree = UPLOAD_FOLDER
+                    for directory in fTree[:len(fTree)-1]:
+                        directoryTree += '/' + directory
+                        if not os.path.isdir(directoryTree):
+                            os.mkdir(directoryTree)
+                    app.config['UPLOAD_FOLDER'] = directoryTree
+                    f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(fTree[len(fTree)-1])))
+
+        return redirect(url_for('main_page'))
 
     return render_template('update_project.html', error=error, project_names=project_names)
 
