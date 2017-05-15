@@ -1,5 +1,6 @@
 import os
 import shutil
+import filecmp
 import re
 import sqlite3
 from Crypto.Cipher import AES
@@ -327,27 +328,43 @@ def update_project():
                 if os.path.isdir(dst):
                     shutil.rmtree(dst)
                 shutil.copytree(src, dst)
+                shutil.copystat(src, dst)
             except:
-                return 'ERROR SHUTIL'
+                return "ERROR python 'shutil' module"
 
             files = request.files.getlist('files[]', None)
+            files_update_list = []
+
             for f in files:
                 fname = f.filename
                 fname = fname.split('/')
                 fname = [str(i) for i in fname]
-                if len(fname) == 1:
-                    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER + '/' + project_name + '/' + member.username + '/'
-                    f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(fname[0])))
+
+                fTree = [fname[0]] + ["branch-" + username] + fname[1:]
+                fTree[0] = project_name
+                directoryTree = UPLOAD_FOLDER
+
+                # writing new file on server
+                for directory in fTree[:len(fTree)-1]:
+                    directoryTree += '/' + directory
+                    if not os.path.isdir(directoryTree):
+                        os.mkdir(directoryTree)
+                app.config['UPLOAD_FOLDER'] = directoryTree
+                f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(fTree[len(fTree)-1])))
+                # end writing line
+
+                # compare file between master/branch and data_backup to get the list of updated files
+                dst_file = dst + "/" + "/".join(fTree[2:])
+                src_file = directoryTree + '/' + fTree[len(fTree)-1]
+                new_file = '/' + project_name + '/' + '/'.join(fTree[1:])
+                if os.path.exists(dst_file):
+                    if not filecmp.cmp(src_file, dst_file):
+                        files_update_list.append(new_file)
                 else:
-                    fTree = [fname[0]] + ["branch-" + username] + fname[1:]
-                    fTree[0] = project_name
-                    directoryTree = UPLOAD_FOLDER
-                    for directory in fTree[:len(fTree)-1]:
-                        directoryTree += '/' + directory
-                        if not os.path.isdir(directoryTree):
-                            os.mkdir(directoryTree)
-                    app.config['UPLOAD_FOLDER'] = directoryTree
-                    f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(fTree[len(fTree)-1])))
+                    files_update_list.append(new_file)
+                # compare file end of line
+
+            return str(files_update_list)
 
         return redirect(url_for('main_page'))
 
