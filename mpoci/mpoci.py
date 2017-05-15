@@ -201,13 +201,13 @@ def edit_member():
             edit_username = request.args.get('username')
             db = get_db()
             db.text_factory = str
-            if edit_flag == '1' and session['username']!=edit_username:
+            if edit_flag == '1' and session['username'] != edit_username:
                 current_access = query_db('select level from members where username = ?', [edit_username], one=True)
                 new_level = 'user' if current_access['level']=='admin' else 'admin'
                 db.execute('update members set level = ? where username = ?', [new_level, edit_username])
                 db.commit()
                 message = "Update Success!"
-            elif edit_flag == '0' and session['username']!=edit_username:
+            elif edit_flag == '0' and session['username'] != edit_username:
                 db.execute('delete from members where username = ?', [edit_username])
                 db.commit()
                 message = "Delete Success!"
@@ -227,7 +227,6 @@ def projectNameValidation(name):
 @app.route('/add_project', methods=['GET','POST'])
 def add_project():
     error = None
-    files = None
     if not checkLogin():
         return redirect(url_for('main_page'))
 
@@ -237,13 +236,13 @@ def add_project():
         project_name = project_name.lower()
         description = request.form['description']
 
-        if len(request.files.getlist('files[]'))==1 and (not project_name or not description):
+        if len(request.files.getlist('files[]')) == 1 and ( not project_name or not description ):
             return render_template('add_project.html', error="* Some fields are empty!")
-        elif len(request.files.getlist('files[]'))>1 and (not project_name or not description):
+        elif len(request.files.getlist('files[]')) > 1 and ( not project_name or not description ):
             return render_template('add_project.html', error="* Some fields are empty!")
-        elif len(request.files.getlist('files[]'))==1 and (project_name or description):
+        elif len(request.files.getlist('files[]')) == 1 and ( project_name or description ):
             return render_template('add_project.html', error="* No folder selected!")
-        elif len(request.files.getlist('files[]'))>1 and project_name and description:
+        elif len(request.files.getlist('files[]')) > 1 and project_name and description:
             if not projectNameValidation(project_name):
                 return render_template('add_project.html', error="* Invalid Project Name!")
 
@@ -293,19 +292,41 @@ def add_project():
                 shutil.copytree(src,dst)
                 shutil.copystat(src,dst)
             # Generate folder End of Line
-
             return redirect(url_for('main_page'))
-
+            
     return render_template('add_project.html', error=error)
 
 @app.route('/update_project', methods=['GET', 'POST'])
 def update_project():
     error = None
-    if len(session) and 'username' in session.keys():
-        project_names = query_db('select project_name from projects',[])
-        return render_template('update_project.html', error=error, project_names=project_names)
-    else:
+    if not len(session) and 'username' not in session.keys():
         return redirect(url_for('main_page'))
+
+    project_names = query_db('select project_name from projects',[])
+
+    if request.method == 'POST':
+        # check if the post request has the file part
+        project_name = request.form['project_name']
+        project_name = project_name.lower()
+        notes = request.form['notes']
+
+        if len(request.files.getlist('files[]')) == 1 and ( not project_name or not notes ):
+            return render_template('update_project.html', error="* Some fields are empty!", project_names=project_names)
+        elif len(request.files.getlist('files[]')) > 1 and ( not project_name or not notes ):
+            return render_template('update_project.html', error="* Some fields are empty!", project_names=project_names)
+        elif len(request.files.getlist('files[]')) == 1 and ( project_name or notes ):
+            return render_template('update_project.html', error="* No folders/files selected!", project_names=project_names)
+        elif len(request.files.getlist('files[]')) > 1 and project_name and notes:
+            if not projectNameValidation(project_name):
+                return render_template('update_project.html', error="* Invalid Project Name!", project_names=project_names)
+
+            files = request.files.getlist('files[]', None)
+            file_list = []
+            for f in files:
+                file_list.append(f.filename)
+            return str(file_list)
+
+    return render_template('update_project.html', error=error, project_names=project_names)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
