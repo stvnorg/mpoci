@@ -246,6 +246,13 @@ def add_project():
         elif len(request.files.getlist('files[]'))>1 and project_name and description:
             if not projectNameValidation(project_name):
                 return render_template('add_project.html', error="* Invalid Project Name!")
+
+            # Check for duplicate project_name
+            query = query_db('select project_name from projects where project_name = ?', [project_name])
+            if len(query):
+                return render_template('add_project.html', error="* Duplicate Project Name!")
+            # End of check duplicate lines
+
             files = request.files.getlist('files[]', None)
 
             # Insert details of projects in the database
@@ -258,7 +265,7 @@ def add_project():
             db.close()
             # End of insert project details
 
-            members = query_db('select username from members', [])
+            members = query_db("select username from members where username not like ? ", ['mpociadmin'])
             # Start to uploading files
             for f in files:
                 fname = f.filename
@@ -282,10 +289,9 @@ def add_project():
             # Generate Branch Folders Project
             src = UPLOAD_FOLDER + '/' + project_name + '/' + 'master'
             for member in members:
-                if member['username'] != 'mpociadmin':
-                    dst = UPLOAD_FOLDER + '/' + project_name + '/' + 'branch-' + member['username']
-                    shutil.copytree(src,dst)
-                    shutil.copystat(src,dst)
+                dst = UPLOAD_FOLDER + '/' + project_name + '/' + 'branch-' + member['username']
+                shutil.copytree(src,dst)
+                shutil.copystat(src,dst)
             # Generate folder End of Line
 
             return redirect(url_for('main_page'))
@@ -302,4 +308,4 @@ def update_project():
         return redirect(url_for('main_page'))
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')
