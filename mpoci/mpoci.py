@@ -259,8 +259,8 @@ def add_project():
             db = get_db()
             db.text_factory = str
             created_by = session['username']
-            db.execute("insert into projects (project_name, description, created_by, created_at) values (?, ?, ?, datetime('now'))",
-                        [project_name, description, created_by])
+            db.execute("insert into projects (project_name, description, created_by, created_at, project_status) values (?, ?, ?, datetime('now'), ?)",
+                        [project_name, description, created_by, 1])
             db.commit()
             db.close()
             # End of insert project details

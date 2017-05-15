@@ -39,5 +39,6 @@ create table projects (
   project_name text not null,
   description text not null,
   created_by text not null,
-  created_at text not null
+  created_at text not null,
+  project_status integer not null
 );
