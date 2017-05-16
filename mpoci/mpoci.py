@@ -263,7 +263,7 @@ def add_project():
                         [project_name, description, created_by, 1])
             db.commit()
             db.close()
-            # End of insert project details
+            # EOL
 
             members = query_db("select username from members where username not like ? ", ['mpociadmin'])
             # Start to uploading files
@@ -284,7 +284,7 @@ def add_project():
                             os.mkdir(directoryTree)
                     app.config['UPLOAD_FOLDER'] = directoryTree
                     f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(fTree[len(fTree)-1])))
-            # End of files upload
+            # EOL
 
             # Generate Branch Folders Project
             src = UPLOAD_FOLDER + '/' + project_name + '/' + 'master'
@@ -292,10 +292,35 @@ def add_project():
                 dst = UPLOAD_FOLDER + '/' + project_name + '/branch-' + member['username']
                 shutil.copytree(src,dst)
                 shutil.copystat(src,dst)
-            # Generate folder End of Line
+            # EOL
             return redirect(url_for('main_page'))
 
     return render_template('add_project.html', error=error)
+
+def dirTree(dir_path):
+
+    DIRECTORY = [dir_path+'/']
+    files_list = []
+
+    dir = True
+
+    while dir:
+        for i in range(len(DIRECTORY)):
+            result = os.listdir(DIRECTORY[i])
+            for r in result:
+                tmp = DIRECTORY[i] + r + '/'
+                if os.path.isdir(tmp):
+                    if tmp not in DIRECTORY:
+                        DIRECTORY.append(tmp)
+                else:
+                    tmp = tmp.strip('/')
+                    if tmp not in files_list:
+                        files_list.append(tmp)
+
+            if i == len(DIRECTORY)-1:
+                dir = False
+    TREE = DIRECTORY + files_list
+    return TREE
 
 @app.route('/update_project', methods=['GET', 'POST'])
 def update_project():
@@ -351,7 +376,7 @@ def update_project():
                         os.mkdir(directoryTree)
                 app.config['UPLOAD_FOLDER'] = directoryTree
                 f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(fTree[len(fTree)-1])))
-                # end writing line
+                # EOL
 
                 # compare file between master/branch and data_backup to get the list of updated files
                 dst_file = dst + "/" + "/".join(fTree[2:])
@@ -363,15 +388,28 @@ def update_project():
                 else:
                     files_update_list.append(new_file)
                 files_update_list.sort()
-                # compare file end of line
+                # EOL
 
-            if files_update_list:
+            # Check files or folder that are deleted in the new updates
+            files_removed = []
+            old_files = dirTree(dst)
+            for f in old_files:
+                f = re.sub('DATA_BACKUP', 'html', f)
+                f = '/' + re.sub('.bak', '', f)
+                if not os.path.exists(f):
+                    files_removed.append(f)
+            # EOL
+
+            files_update = ';'.join(files_update_list) + '-' + ';'.join(files_removed)
+            # Update 'activity' table
+            if files_update:
                 db = get_db()
                 db.text_factory = str
                 db.execute("insert into activity (project_name, branch_name, files_list, updated_by, updated_at, notes, admin_response, merge_status, revert_status, review_status) values (?, ?, ?, ?, datetime('now'), ?, ?, ?, ?, ?)",
-                            [project_name, "branch-"+username, ";".join(files_update_list), username, notes, '-', 0, 0, 0])
+                            [project_name, "branch-"+username, files_update, username, notes, '-', 0, 0, 0])
                 db.commit()
                 db.close()
+            # EOL
 
         return redirect(url_for('main_page'))
 
