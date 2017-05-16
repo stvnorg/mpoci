@@ -320,7 +320,7 @@ def dirTree(dir_path):
             if i == len(DIRECTORY)-1:
                 dir = False
     TREE = DIRECTORY + files_list
-    return TREE
+    return files_list
 
 @app.route('/update_project', methods=['GET', 'POST'])
 def update_project():
@@ -358,7 +358,9 @@ def update_project():
                 return "ERROR python 'shutil' module"
 
             files = request.files.getlist('files[]', None)
+            updates_list = []
             files_update_list = []
+
 
             for f in files:
                 fname = f.filename
@@ -370,11 +372,17 @@ def update_project():
                 directoryTree = UPLOAD_FOLDER
 
                 # writing new file on server
+                if os.path.isdir(src):
+                    shutil.rmtree(src)
+
                 for directory in fTree[:len(fTree)-1]:
                     directoryTree += '/' + directory
                     if not os.path.isdir(directoryTree):
                         os.mkdir(directoryTree)
                 app.config['UPLOAD_FOLDER'] = directoryTree
+
+                updates_list.append(directoryTree + '/' + fTree[len(fTree)-1])
+
                 f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(fTree[len(fTree)-1])))
                 # EOL
 
@@ -396,13 +404,13 @@ def update_project():
             for f in old_files:
                 f = re.sub('DATA_BACKUP', 'html', f)
                 f = '/' + re.sub('.bak', '', f)
-                if not os.path.exists(f):
+                if f not in updates_list:
                     files_removed.append(f)
             # EOL
 
             files_update = ';'.join(files_update_list) + '-' + ';'.join(files_removed)
             # Update 'activity' table
-            if files_update:
+            if files_update_list:
                 db = get_db()
                 db.text_factory = str
                 db.execute("insert into activity (project_name, branch_name, files_list, updated_by, updated_at, notes, admin_response, merge_status, revert_status, review_status) values (?, ?, ?, ?, datetime('now'), ?, ?, ?, ?, ?)",
