@@ -428,6 +428,7 @@ def project_details():
     error = None
     project_name = None
     details = None
+    activities = None
     username = session['username']
     if request.method == 'GET':
         project_name = request.args.get('name')
@@ -437,11 +438,16 @@ def project_details():
         details = query_db('select * from projects where project_name = ?', [project_name.lower()], one=True)
         if not details:
             return redirect(url_for('main_page'))
-            
-        dirs, files = dirTree(UPLOAD_FOLDER + '/' + project_name + '/' + "branch-" + username)
-        return render_template('project_details.html', details=details, files=dirs+files)
+
+        dirs, files = dirTree(UPLOAD_FOLDER + '/' + project_name + '/master')
+        activities = query_db('select * from activity where project_name = ? order by updated_at DESC', [project_name.lower()])
+        return render_template('project_details.html', details=details, files=dirs+files, activities=activities)
     else:
         return redirect(url_for('main_page'))
 
+@app.route('/activity_details', methods=['GET','POST'])
+def activity_details():
+    return '1'
+    
 if __name__ == '__main__':
     app.run(host='0.0.0.0')

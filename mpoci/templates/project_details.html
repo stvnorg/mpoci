@@ -11,7 +11,7 @@
       <div class="access-level">
       {% if details %}
       <label for="project_name">Project Name: <strong>{{ details.project_name.upper() }}</strong> -- </label>
-      <label for="project_created">Created by {{ details.created_by }}, at {{ details.created_at }}</label><br><br>
+      <label for="project_created">Created by <span class="username">{{ details.created_by }}</span>, at {{ details.created_at }}</label><br><br>
       <label for="label_header">Description:</label><br>
       <label for="project_description">{{ details.description }}</label><br><br>
       <label for="label_header">Files:</label><br>
@@ -21,6 +21,35 @@
           {% endfor %}
         {% endif %}
       {% endif %}
+      <br>
+      <label for="label_header">Latest Activity:</label><br>
+       {% if activities %}
+       <table name="activities_table">
+        {% for activity in activities %}
+        <tr>
+          <td>
+            <label for="activities_list">Updated by: <span class="username">{{ activity.updated_by }}</span>, at: {{ activity.updated_at }}&nbsp;&nbsp;</label>
+          </td>
+          <td>
+            <a href="../activity_details" class="details_link"><span class="details">Details</span></a>
+          </td>
+          <td>
+            {% if activity.merge_status==0 and activity.revert_status==0 and activity.review_status==0 %}
+              <span class="new_label">New!</span>
+            {% elif activity.merge_status %}
+              <span class="review_label">Merged</span>
+            {% elif activity.revert_status %}
+              <span class="review_label">Reverted</span>
+            {% elif activity.review_status %}
+              <span class="review_label">Viewed</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+        {% else %}
+          <label for="activities_list">--</label><br>
+        </table>
+       {% endif %}
       </div>
       {% if error %}
         <p class="error">{{ error }}</p>

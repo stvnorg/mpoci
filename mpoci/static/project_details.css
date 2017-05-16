@@ -48,6 +48,15 @@ label[for="files_structure"] {
   padding-left: 10px;
   color: #0067fa;
 }
+label[for="activities_list"] {
+  display: block-inline;
+  font-size: 0.75em;
+  padding-left: 10px;
+  color: #0067fa;
+}
+.username {
+  color: #560030;
+}
 .error {
   display: block;
   padding: 0 0 0.5% 0;
@@ -88,18 +97,37 @@ label[for="files_structure"] {
   transition: all 0.3 ease;
   cursor: pointer;
 }
-a.edit-link, a.edit-link:visited {
+table {
+  margin: 5px 0 0 10px;
+  border-collapse: collapse;
+}
+table tr td {
+  border: 1px solid gray;
+  background: #ddd;
+}
+.details {
   display: block;
-  padding: 5px;
+  padding: 5px 10px;
+  font-size: 0.75em;
   color: #e8e3e4;
   background: #76b852;
 }
-
-a.delete-link, a.delete-link:visited {
+.new_label {
   display: block;
-  color: #720a1e;
-  padding: 5px;
+  padding: 5px 10px;
+  font-size: 0.75em;
+  color: red;
   background: #76b852;
+}
+.review_label {
+  display: block;
+  padding: 5px 10px;
+  font-size: 0.75em;
+  color: #666666;
+  background: #76b852;
+}
+a {
+  text-decoration: none;
 }
 .form button:hover,.form button:active,.form button:focus {
   background: #43A047;
