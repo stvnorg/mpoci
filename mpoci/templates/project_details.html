@@ -31,7 +31,7 @@
             <label for="activities_list">Updated by: <span class="username">{{ activity.updated_by }}</span>, at: {{ activity.updated_at }}&nbsp;&nbsp;</label>
           </td>
           <td>
-            <a href="../activity_details" class="details_link"><span class="details">Details</span></a>
+            <a href="../activity_details" target="_blank" class="details_link"><span class="details">Details</span></a>
           </td>
           <td>
             {% if activity.merge_status==0 and activity.revert_status==0 and activity.review_status==0 %}

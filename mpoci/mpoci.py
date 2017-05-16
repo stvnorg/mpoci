@@ -440,6 +440,10 @@ def project_details():
             return redirect(url_for('main_page'))
 
         dirs, files = dirTree(UPLOAD_FOLDER + '/' + project_name + '/master')
+        for i in range(len(dirs)):
+            dirs[i] = re.sub(UPLOAD_FOLDER,'',dirs[i])
+        for i in range(len(files)):
+            files[i] = re.sub(UPLOAD_FOLDER,'',files[i])
         activities = query_db('select * from activity where project_name = ? order by updated_at DESC', [project_name.lower()])
         return render_template('project_details.html', details=details, files=dirs+files, activities=activities)
     else:
@@ -448,6 +452,6 @@ def project_details():
 @app.route('/activity_details', methods=['GET','POST'])
 def activity_details():
     return '1'
-    
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
