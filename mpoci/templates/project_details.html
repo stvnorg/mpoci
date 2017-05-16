@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<head>
+    <title>QQDewa Continous Integration - Project Details</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='project_details.css') }}" />
+</head>
+<body>
+<div class="project-details-page">
+  <div class="form">
+    <form class="update-project-form" action="../update_project" method="POST" enctype="multipart/form-data">
+      <label for="title-form">Project Details</label>
+      <div class="access-level">
+      {% if details %}
+      <label for="project_name">Project Name: <strong>{{ details.project_name.upper() }}</strong> -- </label>
+      <label for="project_created">Created by {{ details.created_by }}, at {{ details.created_at }}</label><br><br>
+      <label for="label_header">Description:</label><br>
+      <label for="project_description">{{ details.description }}</label><br><br>
+      <label for="label_header">Files:</label><br>
+        {% if files %}
+         {% for file in files %}
+          <label for="files_structure">{{ file }}</label><br>
+          {% endfor %}
+        {% endif %}
+      {% endif %}
+      </div>
+      {% if error %}
+        <p class="error">{{ error }}</p>
+      {% endif %}
+
+    </form>
+  </div>
+</div>
+</body>
+</html>

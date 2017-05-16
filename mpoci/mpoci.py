@@ -147,7 +147,7 @@ def restore():
         db = get_db()
         db.text_factory = str
         password = encryptPass('rahasia')
-        db.execute("insert into members (name, username, password, level, time_date_added) values (?, ?, ?, ?, datetime('now'))",
+        db.execute("insert into members (name, username, password, level, time_date_added) values (?, ?, ?, ?, datetime('now', 'localtime'))",
                 ['Super Admin', 'mpociadmin', password, 'admin'])
         db.commit()
         db.close()
@@ -178,7 +178,7 @@ def new_member():
             if checkNewMember(username):
                 return render_template('new_member.html', error="* Username already exist!")
 
-            db.execute("insert into members (name, username, password, level, time_date_added) values (?, ?, ?, ?, datetime('now'))",
+            db.execute("insert into members (name, username, password, level, time_date_added) values (?, ?, ?, ?, datetime('now', 'localtime'))",
                         [fullname, username, password, access_level])
             db.commit()
             return redirect(url_for('main_page'))
@@ -259,7 +259,7 @@ def add_project():
             db = get_db()
             db.text_factory = str
             created_by = session['username']
-            db.execute("insert into projects (project_name, description, created_by, created_at, project_status) values (?, ?, ?, datetime('now'), ?)",
+            db.execute("insert into projects (project_name, description, created_by, created_at, project_status) values (?, ?, ?, datetime('now', 'localtime'), ?)",
                         [project_name, description, created_by, 1])
             db.commit()
             db.close()
@@ -313,14 +313,13 @@ def dirTree(dir_path):
                     if tmp not in DIRECTORY:
                         DIRECTORY.append(tmp)
                 else:
-                    tmp = tmp.strip('/')
+                    tmp = tmp.rstrip('/')
                     if tmp not in files_list:
                         files_list.append(tmp)
 
             if i == len(DIRECTORY)-1:
                 dir = False
-    TREE = DIRECTORY + files_list
-    return files_list
+    return (DIRECTORY, files_list)
 
 @app.route('/update_project', methods=['GET', 'POST'])
 def update_project():
@@ -361,6 +360,8 @@ def update_project():
             updates_list = []
             files_update_list = []
 
+            if os.path.isdir(src):
+                shutil.rmtree(src)
 
             for f in files:
                 fname = f.filename
@@ -372,9 +373,6 @@ def update_project():
                 directoryTree = UPLOAD_FOLDER
 
                 # writing new file on server
-                if os.path.isdir(src):
-                    shutil.rmtree(src)
-
                 for directory in fTree[:len(fTree)-1]:
                     directoryTree += '/' + directory
                     if not os.path.isdir(directoryTree):
@@ -400,10 +398,10 @@ def update_project():
 
             # Check files or folder that are deleted in the new updates
             files_removed = []
-            old_files = dirTree(dst)
+            _, old_files = dirTree(dst)
             for f in old_files:
                 f = re.sub('DATA_BACKUP', 'html', f)
-                f = '/' + re.sub('.bak', '', f)
+                f = re.sub('.bak', '', f)
                 if f not in updates_list:
                     files_removed.append(f)
             # EOL
@@ -413,7 +411,7 @@ def update_project():
             if files_update_list:
                 db = get_db()
                 db.text_factory = str
-                db.execute("insert into activity (project_name, branch_name, files_list, updated_by, updated_at, notes, admin_response, merge_status, revert_status, review_status) values (?, ?, ?, ?, datetime('now'), ?, ?, ?, ?, ?)",
+                db.execute("insert into activity (project_name, branch_name, files_list, updated_by, updated_at, notes, admin_response, merge_status, revert_status, review_status) values (?, ?, ?, ?, datetime('now','localtime'), ?, ?, ?, ?, ?)",
                             [project_name, "branch-"+username, files_update, username, notes, '-', 0, 0, 0])
                 db.commit()
                 db.close()
@@ -422,6 +420,24 @@ def update_project():
         return redirect(url_for('main_page'))
 
     return render_template('update_project.html', error=error, project_names=project_names)
+
+@app.route('/project_details', methods=['GET','POST'])
+def project_details():
+    if not len(session) and 'username' not in session.keys():
+        return redirect(url_for('main_page'))
+    error = None
+    project_name = None
+    details = None
+    username = session['username']
+    if request.method == 'GET':
+        project_name = request.args.get('name')
+        if not project_name:
+            return redirect(url_for('main_page'))
+        details = query_db('select * from projects where project_name = ?', [project_name.lower()], one=True)
+        dirs, files = dirTree(UPLOAD_FOLDER + '/' + project_name + '/' + "branch-" + username)
+        return render_template('project_details.html', details=details, files=dirs+files)
+    else:
+        return redirect(url_for('main_page'))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
