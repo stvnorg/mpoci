@@ -59,7 +59,7 @@ label[for="files_structure"] {
 .form {
   position: relative;
   z-index: 1;
-  background: #ccc;
+  background: #eee;
   max-width: 480px;
   margin: 50px auto 100px;
   padding: 45px;

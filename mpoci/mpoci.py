@@ -433,7 +433,11 @@ def project_details():
         project_name = request.args.get('name')
         if not project_name:
             return redirect(url_for('main_page'))
+
         details = query_db('select * from projects where project_name = ?', [project_name.lower()], one=True)
+        if not details:
+            return redirect(url_for('main_page'))
+            
         dirs, files = dirTree(UPLOAD_FOLDER + '/' + project_name + '/' + "branch-" + username)
         return render_template('project_details.html', details=details, files=dirs+files)
     else:
