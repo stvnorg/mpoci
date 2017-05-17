@@ -498,6 +498,21 @@ def delete_project():
             elif flag=='1':
                 db.execute('update projects set project_status = 1 where project_name = ?', [project_name])
                 db.commit()
+            elif flag=='2':
+                db.execute('delete from projects where project_name = ?', [project_name])
+                db.commit()
+                db.execute('delete from activity where project_name = ?', [project_name])
+                db.commit()
+                src = UPLOAD_FOLDER + '/' + project_name
+                dst = '/var/www/qqdewa.test/DATA_BACKUP/' + project_name
+                try:
+                    if os.path.isdir(dst):
+                        shutil.rmtree(dst)
+                    if os.path.isdir(src):
+                        shutil.rmtree(src)
+                except:
+                    return redirect(url_for('main_page'))
+                return redirect(url_for('main_page'))
             return redirect('http://mpoci.portal/project_details?name=' + project_name)
         except:
             return redirect(url_for('main_page'))
