@@ -430,6 +430,8 @@ def project_details():
     details = None
     activities = None
     username = session['username']
+    userlevel = 1 if checkLogin() else None
+
     if request.method == 'GET':
         project_name = request.args.get('name')
         if not project_name:
@@ -445,9 +447,44 @@ def project_details():
         for i in range(len(files)):
             files[i] = re.sub(UPLOAD_FOLDER,'',files[i])
         activities = query_db('select * from activity where project_name = ? order by updated_at DESC', [project_name.lower()])
-        return render_template('project_details.html', details=details, files=dirs+files, activities=activities)
+        return render_template('project_details.html', details=details, files=dirs+files, activities=activities, userlevel=userlevel)
     else:
         return redirect(url_for('main_page'))
+
+@app.route('/view_project', methods=['GET','POST'])
+def view_project():
+    if not len(session) and 'username' not in session.keys():
+        return redirect(url_for('main_page'))
+    error = None
+    project_name = None
+    username = session['username']
+    # Check if View link is selected, if Yes it will update the table
+    view = request.args.get('view')
+    project_name = request.args.get('project_name')
+    activity_id = request.args.get('activity_id')
+    if view and project_name and activity_id:
+        try:
+            activity_id = int(activity_id)
+        except:
+            return redirect(url_for('main_page'))
+        db = get_db()
+        db.text_factory = str
+        db.execute('update activity set review_status=1 where id=?',[activity_id])
+        db.commit()
+        db.close()
+        return redirect("http://qqdewa.test/" + project_name + '/' + "branch-" + username)
+    return redirect(url_for('main_page'))
+    # EOL
+
+@app.route('/delete_project', methods=['GET','POST'])
+def delete_project():
+    error = None
+    if not checkLogin():
+        return redirect(url_for('main_page'))
+    flag = request.args.get('flag')
+    project_name = request.args.get('project_name')
+    return flag + ' ' + project_name
+    return render_template('delete_project.html', error=error)
 
 @app.route('/activity_details', methods=['GET','POST'])
 def activity_details():

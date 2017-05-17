@@ -14,17 +14,22 @@ label[for="title-form"] {
   width: 100%;
   margin: 0 0 5% 0;
   background: #ccc;
-  text-decoration: underline;
 }
 .access-level {
   width: 100%;
   text-align: left;
   padding: 0 0 5% 0;
 }
-label[for="project_name"] {
+label[for="project_name_enabled"] {
   display: block-inline;
   font-size: 0.9em;
   color: #111;
+}
+label[for="project_name_disabled"] {
+  display: block-inline;
+  font-size: 0.9em;
+  color: #111;
+  text-decoration: line-through;
 }
 label[for="project_created"] {
   display: block-inline;
@@ -105,11 +110,11 @@ table tr td {
   border: 1px solid gray;
   background: #ddd;
 }
-.details {
+.details, .view {
   display: block;
   padding: 5px 10px;
   font-size: 0.75em;
-  color: #e8e3e4;
+  color: #111;
   background: #76b852;
 }
 .new_label {
@@ -126,8 +131,8 @@ table tr td {
   color: #666666;
   background: #76b852;
 }
-a {
-  text-decoration: none;
+a, a:visited {
+  color: #111;
 }
 .form button:hover,.form button:active,.form button:focus {
   background: #43A047;
@@ -177,22 +182,18 @@ a {
 .container .info span .fa {
   color: #EF3B3A;
 }
-.member-list {
-  border: 1px solid grey;
-  border-collapse: collapse;
-  font-size: 12px;
-  font-family: "Roboto", sans-serif;
+.disable_div {
+  text-align: left;
+  margin: 10px 0 0 0;
 }
-.member-list th {
-  background-color: black;
-  color: white;
-  padding: 5px;
+a.disable_link, a.disable_link:visited {
+  display: block-inline;
+  padding: 5px 10px;
+  font-size: 0.75em;
+  color: #4f0408;
+  background: #ddd;
+  text-decoration: underline;
 }
-.member-list tr td {
-  border: 1px solid grey;
-  border-collapse: collapse;
-}
-
 body {
   background: #76b852; /* fallback for old browsers */
   background: -webkit-linear-gradient(right, #76b852, #8DC26F);

@@ -2,15 +2,24 @@
 <head>
     <title>QQDewa Continous Integration - Project Details</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='project_details.css') }}" />
+    <script type="text/javascript">
+      function reloadURL() {
+        setTimeout(location.reload.bind(location), 5000);
+      }
+    </script>
 </head>
 <body>
 <div class="project-details-page">
   <div class="form">
-    <form class="update-project-form" action="../update_project" method="POST" enctype="multipart/form-data">
+    <form class="project_details-form" action="../project_details" method="POST">
       <label for="title-form">Project Details</label>
       <div class="access-level">
       {% if details %}
-      <label for="project_name">Project Name: <strong>{{ details.project_name.upper() }}</strong> -- </label>
+        {% if details.project_status %}
+        <label for="project_name_enabled">Project Name: <a href="http://qqdewa.test/{{ details.project_name }}/master" target="_blank"><strong>{{ details.project_name.upper() }}</strong></a> -- </label>
+        {% else %}
+        <label for="project_name_disabled">Project Name: <strong>{{ details.project_name.upper() }}</strong> -- </label>
+        {% endif %}
       <label for="project_created">Created by <span class="username">{{ details.created_by }}</span>, at {{ details.created_at }}</label><br><br>
       <label for="label_header">Description:</label><br>
       <label for="project_description">{{ details.description }}</label><br><br>
@@ -34,13 +43,16 @@
             <a href="../activity_details" target="_blank" class="details_link"><span class="details">Details</span></a>
           </td>
           <td>
+            <a href="../view_project?view=1&project_name={{ activity.project_name }}&activity_id={{ activity.id }}" class="view_link" target="_blank" onclick="setTimeout(location.reload.bind(location), 5000);"><span class="view">View</span></a>
+          </td>
+          <td>
             {% if activity.merge_status==0 and activity.revert_status==0 and activity.review_status==0 %}
               <span class="new_label">New!</span>
-            {% elif activity.merge_status %}
+            {% elif activity.merge_status==1 %}
               <span class="review_label">Merged</span>
-            {% elif activity.revert_status %}
+            {% elif activity.revert_status==1 %}
               <span class="review_label">Reverted</span>
-            {% elif activity.review_status %}
+            {% elif activity.review_status==1 %}
               <span class="review_label">Viewed</span>
             {% endif %}
           </td>
@@ -48,7 +60,17 @@
         {% endfor %}
         {% else %}
           <label for="activities_list">--</label><br>
-        </table>
+       {% endif %}
+       </table>
+      </div>
+      <div class="disable_div">
+        {% if userlevel %}
+         <a href="../delete_project?flag=2&project_name={{ details.project_name }}" class="disable_link">Delete Project</a>
+         {% if details.project_status %}
+         <a href="../delete_project?flag=0&project_name={{ details.project_name }}" class="disable_link">Disable Project</a>
+         {% else %}
+         <a href="../delete_project?flag=1&project_name={{ details.project_name }}" class="disable_link">Enable Project</a>
+         {% endif %}
        {% endif %}
       </div>
       {% if error %}
