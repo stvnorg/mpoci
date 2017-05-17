@@ -6,6 +6,16 @@
       function reloadURL() {
         setTimeout(location.reload.bind(location), 5000);
       }
+      function confirmDisable(rURL, project_name) {
+        if (confirm("Are you sure want to disable project ".concat(project_name.toUpperCase()).concat(" ?"))) {
+          document.location = rURL;
+        }
+      }
+      function confirmDelete(rURL, project_name) {
+        if (confirm("Are you sure want to delete project_name ".concat(project_name.toUpperCase()).concat(" ?"))) {
+          document.location = delURL;
+        }
+      }
     </script>
 </head>
 <body>
@@ -16,9 +26,9 @@
       <div class="access-level">
       {% if details %}
         {% if details.project_status %}
-        <label for="project_name_enabled">Project Name: <a href="http://qqdewa.test/{{ details.project_name }}/master" target="_blank"><strong>{{ details.project_name.upper() }}</strong></a> -- </label>
+        <label for="project_name">Project Name: <a href="http://qqdewa.test/{{ details.project_name }}/master" target="_blank"><strong>{{ details.project_name.upper() }}</strong></a> -- </label>
         {% else %}
-        <label for="project_name_disabled">Project Name: <strong>{{ details.project_name.upper() }}</strong> -- </label>
+        <label for="project_name">Project Name: <strong><span name="disabled-project">{{ details.project_name.upper() }}</span></strong> -- </label>
         {% endif %}
       <label for="project_created">Created by <span class="username">{{ details.created_by }}</span>, at {{ details.created_at }}</label><br><br>
       <label for="label_header">Description:</label><br>
@@ -65,10 +75,10 @@
       </div>
       <div class="disable_div">
         {% if userlevel %}
-         <a href="../delete_project?flag=2&project_name={{ details.project_name }}" class="disable_link">Delete Project</a>
-         {% if details.project_status %}
-         <a href="../delete_project?flag=0&project_name={{ details.project_name }}" class="disable_link">Disable Project</a>
-         {% else %}
+         <a href="javascript:confirmDelete('../delete_project?flag=2&project_name={{ details.project_name }}', '{{ details.project_name }}' )" class="disable_link">Delete Project</a>
+         {% if userlevel and details.project_status==1 %}
+         <a href="javascript:confirmDisable('../delete_project?flag=0&project_name={{ details.project_name }}', '{{ details.project_name }}' )" class="disable_link">Disable Project</a>
+         {% elif userlevel and details.project_status==0 %}
          <a href="../delete_project?flag=1&project_name={{ details.project_name }}" class="disable_link">Enable Project</a>
          {% endif %}
        {% endif %}

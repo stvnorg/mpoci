@@ -20,12 +20,12 @@ label[for="title-form"] {
   text-align: left;
   padding: 0 0 5% 0;
 }
-label[for="project_name_enabled"] {
+label[for="project_name"] {
   display: block-inline;
   font-size: 0.9em;
   color: #111;
 }
-label[for="project_name_disabled"] {
+span[name="disabled-project"] {
   display: block-inline;
   font-size: 0.9em;
   color: #111;

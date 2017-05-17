@@ -422,7 +422,7 @@ def update_project():
     return render_template('update_project.html', error=error, project_names=project_names)
 
 @app.route('/project_details', methods=['GET','POST'])
-def project_details():
+def project_details(name=None):
     if not len(session) and 'username' not in session.keys():
         return redirect(url_for('main_page'))
     error = None
@@ -433,7 +433,10 @@ def project_details():
     userlevel = 1 if checkLogin() else None
 
     if request.method == 'GET':
-        project_name = request.args.get('name')
+        if name:
+            project_name = name
+        else:
+            project_name = request.args.get('name')
         if not project_name:
             return redirect(url_for('main_page'))
 
@@ -458,11 +461,12 @@ def view_project():
     error = None
     project_name = None
     username = session['username']
+
     # Check if View link is selected, if Yes it will update the table
     view = request.args.get('view')
     project_name = request.args.get('project_name')
     activity_id = request.args.get('activity_id')
-    if view and project_name and activity_id:
+    if view and project_name and activity_id and checkLogin():
         try:
             activity_id = int(activity_id)
         except:
@@ -483,8 +487,23 @@ def delete_project():
         return redirect(url_for('main_page'))
     flag = request.args.get('flag')
     project_name = request.args.get('project_name')
-    return flag + ' ' + project_name
-    return render_template('delete_project.html', error=error)
+
+    if flag and project_name:
+        db = get_db()
+        db.text_factory = str
+        try:
+            if flag=='0':
+                db.execute('update projects set project_status = 0 where project_name = ?', [project_name])
+                db.commit()
+            elif flag=='1':
+                db.execute('update projects set project_status = 1 where project_name = ?', [project_name])
+                db.commit()
+            return redirect('http://mpoci.portal/project_details?name=' + project_name)
+        except:
+            return redirect(url_for('main_page'))
+        db.close()
+
+    return redirect(url_for('main_page'))
 
 @app.route('/activity_details', methods=['GET','POST'])
 def activity_details():
