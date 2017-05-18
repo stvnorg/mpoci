@@ -522,7 +522,35 @@ def delete_project():
 
 @app.route('/activity_details', methods=['GET','POST'])
 def activity_details():
-    return '1'
+    if not len(session) and 'username' not in session.keys():
+        return redirect(url_for('main_page'))
+    error = None
+    details = None
+    project_status = None
+    activity_id = None
+    username = session['username']
+    userlevel = 1 if checkLogin() else None
+    if request.method == 'GET':
+
+        activity_id = request.args.get('act_id')
+        try:
+            activity_id = int(activity_id)
+        except:
+            return redirect(url_for('main_page'))
+
+        details = query_db('select * from activity where id = ?', [activity_id], one=True)
+        if not details:
+            return redirect(url_for('main_page'))
+
+        dirs, files = dirTree(UPLOAD_FOLDER + '/' + details['project_name'] + '/branch-' + details['updated_by'])
+        for i in range(len(dirs)):
+            dirs[i] = re.sub(UPLOAD_FOLDER,'',dirs[i])
+        for i in range(len(files)):
+            files[i] = re.sub(UPLOAD_FOLDER,'',files[i])
+        project_status = query_db('select project_status from projects where project_name = ?', [details['project_name']], one=True)
+        return render_template('activity_details.html', details=details, project_status=project_status, files=dirs+files, userlevel=userlevel)
+    else:
+        return redirect(url_for('main_page'))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
