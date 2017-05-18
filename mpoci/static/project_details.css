@@ -60,6 +60,7 @@ label[for="activities_list"] {
   color: #0067fa;
 }
 .username {
+  font-size: 1em;
   color: #560030;
 }
 .error {
@@ -123,15 +124,13 @@ table tr td {
   padding: 5px 10px;
   font-size: 0.9em;
   color: red;
-  background: #76b852;
 }
 .review_label {
   font-family: monospace;
   display: block;
   padding: 5px 10px;
-  font-size: 0.9em;
+  font-size: 0.8em;
   color: #353eb7;
-  background: #76b852;
 }
 a, a:visited {
   color: #111;

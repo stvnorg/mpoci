@@ -60,6 +60,7 @@ label[for="activities_list"] {
   color: #0067fa;
 }
 .username {
+  font-size: 1em;
   color: #560030;
 }
 .error {

@@ -346,6 +346,10 @@ def update_project():
             if not projectNameValidation(project_name):
                 return render_template('update_project.html', error="* Invalid Project Name!", project_names=project_names)
 
+            query = query_db('select * from projects where project_name = ? and project_status = 0', [project_name])
+            if query:
+                return render_template('update_project.html', error="* Update not allowed, project " + project_name.upper() + " has been disabled!", project_names=project_names)
+
             src = UPLOAD_FOLDER + '/' + project_name + '/branch-' + username
             dst = '/var/www/qqdewa.test/DATA_BACKUP/' + project_name + '/branch-' + username + '.bak'
             try:
@@ -411,6 +415,8 @@ def update_project():
             if files_update_list:
                 db = get_db()
                 db.text_factory = str
+                db.execute("update activity set revert_status = 1 where project_name = ? and updated_by = ?", [project_name, username])
+                db.commit()
                 db.execute("insert into activity (project_name, branch_name, files_list, updated_by, updated_at, notes, admin_response, merge_status, revert_status, review_status) values (?, ?, ?, ?, datetime('now','localtime'), ?, ?, ?, ?, ?)",
                             [project_name, "branch-"+username, files_update, username, notes, '-', 0, 0, 0])
                 db.commit()
