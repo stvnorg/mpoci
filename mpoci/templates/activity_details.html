@@ -11,8 +11,8 @@
           document.location = rURL;
         }
       }
-      function confirmDelete(rURL, project_name) {
-        if (confirm("Are you sure want to delete project ".concat(project_name.toUpperCase()).concat(" ?"))) {
+      function confirmRevert(rURL) {
+        if (confirm("Are you sure want to revert this updates? ")) {
           document.location = rURL;
         }
       }
@@ -28,9 +28,16 @@
         {% if project_status.project_status %}
         <label for="project_name">Project Name: <a href="http://qqdewa.test/{{ details.project_name }}/master" target="_blank"><strong>{{ details.project_name.upper() }}</strong></a></label><br>
         {% else %}
-        <label for="project_name">Project Name: <strong><span name="disabled-project">{{ details.project_name.upper() }}</span></strong> -- </label>
+        <label for="project_name">Project Name: <strong><span name="disabled-project">{{ details.project_name.upper() }}</span></strong></label>
         {% endif %}
-      <label for="project_updated">updated by <span class="username">{{ details.updated_by }}</span>, at {{ details.updated_at }}</label><br><br>
+        {% if details.revert_status == 0 %}
+          <label for="project_updated">updated by <span class="username">{{ details.updated_by }}</span>, at {{ details.updated_at }}</label><br><br>
+        {% else %}
+          <span name=disabled-project><label for="project_updated">updated by <span class="username">{{ details.updated_by }}</span>, at {{ details.updated_at }}</label></span><br>
+          {% if reverted_activity %}
+            <label for="project_updated">reverted by <span class="username">{{ reverted_activity.reverted_by }}</span>, at {{ reverted_activity.reverted_at }}</label><br><br>
+          {% endif %}
+        {% endif %}
       <label for="label_header">Note:</label><br>
       <label for="update_notes">{{ details.notes }}</label><br><br>
       <label for="label_header">Files:</label><br>
@@ -43,11 +50,13 @@
       <br>
       </div>
       <div class="action_div">
+        {% if details.revert_status==0 %}
          <a href="../view_project?view=1&project_name={{ details.project_name }}&activity_id={{ details.id }}" class="action_link" target="_blank"><span class="view">View</span></a>&nbsp;&nbsp;
          {% if userlevel %}
          <a href="" class="action_link">Merge</a>&nbsp;&nbsp;
          {% endif %}
-         <a href="" class="action_link">Revert</a>&nbsp;&nbsp;
+          <a href="javascript:confirmRevert('../revert_updates?flag=1&act_id={{ details.id }}')" class="action_link">Revert</a>
+         {% endif %}
       </div>
     </form>
   </div>

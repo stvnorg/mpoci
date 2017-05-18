@@ -23,14 +23,24 @@ create table activity (
     review_status integer not null
 );
 
-drop table if exists latest_merge;
-create table latest_merge (
+drop table if exists merge_activity;
+create table merge_activity (
     id integer primary key autoincrement,
     activity_id integer not null,
     project_name text not null,
     branch_name text not null,
     merged_by text not null,
     merged_at text not null
+);
+
+drop table if exists revert_activity;
+create table revert_activity (
+  id integer primary key autoincrement,
+  activity_id integer not null,
+  project_name text not null,
+  branch_name text not null,
+  reverted_by text not null,
+  reverted_at text not null
 );
 
 drop table if exists projects;

@@ -119,16 +119,18 @@ table tr td {
 }
 .new_label {
   display: block;
+  font-family: monospace;
   padding: 5px 10px;
-  font-size: 0.75em;
+  font-size: 0.9em;
   color: red;
   background: #76b852;
 }
 .review_label {
+  font-family: monospace;
   display: block;
   padding: 5px 10px;
-  font-size: 0.75em;
-  color: #666666;
+  font-size: 0.9em;
+  color: #353eb7;
   background: #76b852;
 }
 a, a:visited {

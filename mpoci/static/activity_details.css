@@ -160,10 +160,15 @@ a, a:visited {
 a.action_link, a.action_link:visited {
   display: block-inline;
   padding: 5px 20px;
-  font-size: 0.9em;
+  font-size: 0.8em;
   color: #4f0408;
   background: #ccc;
-  text-decoration: underline;
+  text-decoration: none;
+}
+a.action_link:hover {
+  color: #6f2408;
+  font-size: 0.85em;
+  background: #ccb;
 }
 body {
   background: #76b852; /* fallback for old browsers */

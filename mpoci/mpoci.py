@@ -528,10 +528,10 @@ def activity_details():
     details = None
     project_status = None
     activity_id = None
+    reverted_activity = None
     username = session['username']
     userlevel = 1 if checkLogin() else None
     if request.method == 'GET':
-
         activity_id = request.args.get('act_id')
         try:
             activity_id = int(activity_id)
@@ -548,7 +548,59 @@ def activity_details():
         for i in range(len(files)):
             files[i] = re.sub(UPLOAD_FOLDER,'',files[i])
         project_status = query_db('select project_status from projects where project_name = ?', [details['project_name']], one=True)
-        return render_template('activity_details.html', details=details, project_status=project_status, files=dirs+files, userlevel=userlevel)
+        reverted_activity = query_db('select * from revert_activity where activity_id = ?', [activity_id], one=True)
+        return render_template('activity_details.html', details=details, project_status=project_status, files=dirs+files, userlevel=userlevel, reverted_activity=reverted_activity)
+    else:
+        return redirect(url_for('main_page'))
+
+@app.route('/revert_updates', methods=['GET','POST'])
+def revert_updates():
+    if not len(session) and 'username' not in session.keys():
+        return redirect(url_for('main_page'))
+    flag = None
+    activity_id = None
+    username = session['username']
+    userlevel = 1 if checkLogin() else None
+    if request.method == 'GET':
+        flag = request.args.get('flag')
+        activity_id = request.args.get('act_id')
+
+        if flag != '1':
+            return redirect(url_for('main_page'))
+
+        try:
+            activity_id = int(activity_id)
+        except:
+            return redirect(url_for('main_page'))
+
+        revert_query = query_db('select * from activity where id = ?', [activity_id], one=True)
+
+        db = get_db()
+        db.text_factory = str
+
+        if revert_query:
+            if revert_query['updated_by'] != username or not checkLogin():
+                return redirect(url_for('main_page'))
+            project_name = revert_query['project_name']
+            branch_name = revert_query['branch_name']
+            db.execute("update activity set revert_status = 1 where id = ?", [activity_id])
+            db.commit()
+            db.execute("insert into revert_activity (activity_id, project_name, branch_name, reverted_by, reverted_at) values (?, ?, ?, ?, datetime('now','localtime'))",
+                        [activity_id, project_name, branch_name, username])
+            db.commit()
+            old_dir_path = '/var/www/qqdewa.test/DATA_BACKUP/' + project_name + '/' + branch_name + '.bak'
+            current_dir_path = UPLOAD_FOLDER + '/' + project_name + '/' + branch_name
+            try:
+                if os.path.isdir(current_dir_path):
+                    shutil.rmtree(current_dir_path)
+                shutil.copytree(old_dir_path, current_dir_path)
+                shutil.copystat(old_dir_path, current_dir_path)
+            except Exception as e:
+                return str(e)
+            db.close()
+            return redirect('http://mpoci.portal/activity_details?act_id=' + str(activity_id))
+        else:
+            return redirect(url_for('main_page'))
     else:
         return redirect(url_for('main_page'))
 
