@@ -417,6 +417,12 @@ def update_project():
                 db.text_factory = str
                 db.execute("update activity set revert_status = 1 where project_name = ? and updated_by = ?", [project_name, username])
                 db.commit()
+                query = query_db('select * from activity where project_name = ? and updated_by = ?', [project_name, username])
+                for q in query:
+                    activity_id = q['id']
+                    db.execute("insert into revert_activity (activity_id, project_name, branch_name, reverted_by, reverted_at) values (?, ?, ?, ?, datetime('now','localtime'))",
+                                [activity_id, project_name, "branch-"+username, username])
+                    db.commit()
                 db.execute("insert into activity (project_name, branch_name, files_list, updated_by, updated_at, notes, admin_response, merge_status, revert_status, review_status) values (?, ?, ?, ?, datetime('now','localtime'), ?, ?, ?, ?, ?)",
                             [project_name, "branch-"+username, files_update, username, notes, '-', 0, 0, 0])
                 db.commit()
@@ -601,8 +607,8 @@ def revert_updates():
                     shutil.rmtree(current_dir_path)
                 shutil.copytree(old_dir_path, current_dir_path)
                 shutil.copystat(old_dir_path, current_dir_path)
-            except Exception as e:
-                return str(e)
+            except:
+                return "ERROR SHUTIL MODULE"
             db.close()
             return redirect('http://mpoci.portal/activity_details?act_id=' + str(activity_id))
         else:
