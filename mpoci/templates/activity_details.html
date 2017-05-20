@@ -2,16 +2,8 @@
 <head>
     <title>QQDewa Continous Integration - Project Details</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='activity_details.css') }}" />
-    <script type="text/javascript">
-      function reloadURL() {
-        setTimeout(location.reload.bind(location), 5000);
-      }
-      function confirmDisable(rURL, project_name) {
-        if (confirm("Are you sure want to disable project ".concat(project_name.toUpperCase()).concat(" ?"))) {
-          document.location = rURL;
-        }
-      }
-    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="{{ url_for('js', filename='popup.js') }}"></script>
 </head>
 <body>
 <div class="activity-details-page">
@@ -56,10 +48,12 @@
         {% if details.revert_status==0 %}
          <a href="../view_project?view=1&project_name={{ details.project_name }}&activity_id={{ details.id }}" class="action_link" target="_blank"><span class="view">View</span></a>&nbsp;&nbsp;
          {% if userlevel %}
-         <a href="" class="action_link">Merge</a>&nbsp;&nbsp;
+         <a href="javascript:showForm()" class="action_link">Merge</a>&nbsp;&nbsp;
          {% endif %}
           <!-- <a href="javascript:confirmRevert('../revert_updates?flag=1&act_id={{ details.id }}')" class="action_link">Revert</a> -->
          {% endif %}
+      </div>
+      <div id="hiddenForm">
       </div>
     </form>
   </div>

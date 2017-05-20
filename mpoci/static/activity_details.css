@@ -171,6 +171,14 @@ a.action_link:hover {
   font-size: 0.85em;
   background: #ccb;
 }
+#hiddenForm {
+  margin: 30px 0 0 0;
+  padding: 10px;
+  text-align: center;
+  width: 100%;
+  position: relative;
+  background: #aaa;
+}
 body {
   background: #76b852; /* fallback for old browsers */
   background: -webkit-linear-gradient(right, #76b852, #8DC26F);
