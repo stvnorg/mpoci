@@ -19,8 +19,11 @@ create table activity (
     notes text not null,
     admin_response text not null,
     merge_status integer not null,
+    merge_notes text not null,
     revert_status integer not null,
-    review_status integer not null
+    review_status integer not null,
+    activity_status integer not null,
+    activity_notes text not null
 );
 
 drop table if exists merge_activity;

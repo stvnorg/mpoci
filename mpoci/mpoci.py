@@ -420,11 +420,11 @@ def update_project():
                 query = query_db('select * from activity where project_name = ? and updated_by = ?', [project_name, username])
                 for q in query:
                     activity_id = q['id']
-                    db.execute("insert into revert_activity (activity_id, project_name, branch_name, reverted_by, reverted_at) values (?, ?, ?, ?, datetime('now','localtime'))",
-                                [activity_id, project_name, "branch-"+username, username])
-                    db.commit()
-                db.execute("insert into activity (project_name, branch_name, files_list, updated_by, updated_at, notes, admin_response, merge_status, revert_status, review_status) values (?, ?, ?, ?, datetime('now','localtime'), ?, ?, ?, ?, ?)",
-                            [project_name, "branch-"+username, files_update, username, notes, '-', 0, 0, 0])
+                    #db.execute("insert into revert_activity (activity_id, project_name, branch_name, reverted_by, reverted_at) values (?, ?, ?, ?, datetime('now','localtime'))",
+                    #            [activity_id, project_name, "branch-"+username, username])
+                    #db.commit()
+                db.execute("insert into activity (project_name, branch_name, files_list, updated_by, updated_at, notes, admin_response, merge_status, merge_notes, revert_status, review_status, activity_status, activity_notes) values (?, ?, ?, ?, datetime('now','localtime'), ?, ?, ?, ?, ?, ?, ?, ?)",
+                            [project_name, "branch-"+username, files_update, username, notes, '-', 0, '-', 0, 0, 1, '-'])
                 db.commit()
                 db.close()
             # EOL
@@ -540,7 +540,7 @@ def activity_details():
     details = None
     project_status = None
     activity_id = None
-    reverted_activity = None
+    #reverted_activity = None
     username = session['username']
     userlevel = 1 if checkLogin() else None
     if request.method == 'GET':
@@ -560,8 +560,8 @@ def activity_details():
         for i in range(len(files)):
             files[i] = re.sub(UPLOAD_FOLDER,'',files[i])
         project_status = query_db('select project_status from projects where project_name = ?', [details['project_name']], one=True)
-        reverted_activity = query_db('select * from revert_activity where activity_id = ?', [activity_id], one=True)
-        return render_template('activity_details.html', details=details, project_status=project_status, files=dirs+files, userlevel=userlevel, reverted_activity=reverted_activity)
+        #reverted_activity = query_db('select * from revert_activity where activity_id = ?', [activity_id], one=True)
+        return render_template('activity_details.html', details=details, project_status=project_status, files=dirs+files, userlevel=userlevel)
     else:
         return redirect(url_for('main_page'))
 
