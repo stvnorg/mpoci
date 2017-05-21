@@ -43,9 +43,10 @@ label[for="label_header"] {
 }
 label[for="update_notes"] {
   display: block-inline;
-  font-size: 0.8em;
   padding: 10px;
-  color: #111;
+  font-size: 0.8em;
+  font-style: italic;
+  color: #333;
 }
 label[for="files_structure"] {
   display: block-inline;

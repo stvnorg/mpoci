@@ -74,7 +74,7 @@
         {% if project_status.project_status %}
         <label for="project_name">Project Name: <a href="http://qqdewa.test/{{ details.project_name }}/master" target="_blank"><strong>{{ details.project_name.upper() }}</strong></a></label><br>
         {% else %}
-        <label for="project_name">Project Name: <strong><span name="disabled-project">{{ details.project_name.upper() }}</span></strong></label>
+        <label for="project_name">Project Name: <strong><span name="disabled-project">{{ details.project_name.upper() }}</span></strong></label><br>
         {% endif %}
         {% if details.revert_status == 0 and details.activity_status == 1%}
           <label for="project_updated">Updated by <span class="username">{{ details.updated_by }}</span>, at {{ details.updated_at }}</label><br><br>
@@ -90,10 +90,10 @@
         {% endif %}
       <label for="label_header">Note:</label><br>
       <label for="update_notes">{{ details.notes }}</label><br><br>
-      {% if details.merge_notes==1 %}
-        <label for="label_header">Reply:</label><br>
+      {% if details.merge_status==1 %}
+        <label for="label_header">Admin Notes:</label><br>
         <label for="update_notes">{{ details.merge_notes }}</label><br><br>
-      {% elif details.activity_notes==1 %}
+      {% elif details.activity_status==0 %}
         <label for="label_header">Reply:</label><br>
         <label for="update_notes">{{ details.activity_notes }}</label><br><br>
       {% endif %}
@@ -109,7 +109,7 @@
       <div class="action_div">
         {% if details.revert_status==0 %}
          <a href="../view_project?view=1&project_name={{ details.project_name }}&activity_id={{ details.id }}" class="action_link" target="_blank"><span class="view">View</span></a>&nbsp;&nbsp;
-         {% if userlevel %}
+         {% if userlevel and details.merge_status == 0 and details.activity_status == 1 %}
          <a href="javascript:showMergeDiv();" class="action_link">Merge Updates</a>&nbsp;&nbsp;
          <a href="javascript:showCloseDiv();" class="action_link">Close Ticket</a>&nbsp;&nbsp;
          {% endif %}

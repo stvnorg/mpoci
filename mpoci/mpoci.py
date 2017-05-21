@@ -2,6 +2,7 @@ import os
 import shutil
 import filecmp
 import re
+from datetime import datetime
 import sqlite3
 from Crypto.Cipher import AES
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
@@ -440,9 +441,31 @@ def project_details(name=None):
     error = None
     project_name = None
     details = None
-    activities = None
+    activities = []
     username = session['username']
     userlevel = 1 if checkLogin() else None
+
+    def sortActivity(activity):
+        A = [i for i in activity]
+        i = 0
+        n = 2 if len(A) > 2 else 1
+        while i < len(A)-n:
+            Ax = A[i]['updated_at'].split(' ')
+            Ay = A[i+1]['updated_at'].split(' ')
+            Ax = Ax[0].split('-')+Ax[1].split(':')
+            Ay = Ay[0].split('-')+Ay[1].split(':')
+            Ax = [int(j) for j in Ax]
+            Ay = [int(j) for j in Ay]
+            Ax = datetime(Ax[0],Ax[1],Ax[2],Ax[3],Ax[4],Ax[5])
+            Ay = datetime(Ay[0],Ay[1],Ay[2],Ay[3],Ay[4],Ay[5])
+
+            if Ax < Ay:
+                A[i],A[i+1] = A[i+1], A[i]
+            if i != 0:
+                i -= 1
+            else:
+                i += 1
+        return A
 
     if request.method == 'GET':
         if name:
@@ -461,8 +484,12 @@ def project_details(name=None):
             dirs[i] = re.sub(UPLOAD_FOLDER,'',dirs[i])
         for i in range(len(files)):
             files[i] = re.sub(UPLOAD_FOLDER,'',files[i])
-        activities = query_db('select * from activity where project_name = ? order by updated_at DESC', [project_name.lower()])
-        return render_template('project_details.html', details=details, files=dirs+files, activities=activities, userlevel=userlevel)
+        query = query_db('select * from members',[])
+        for q in query:
+            name_activity = query_db('select * from activity where updated_by = ?',[q['username']], one=True)
+            if name_activity:
+                activities.append(name_activity)
+        return render_template('project_details.html', details=details, files=dirs+files, activities=sortActivity(activities), userlevel=userlevel)
     else:
         return redirect(url_for('main_page'))
 
@@ -595,7 +622,7 @@ def merge():
             return "ERROR SHUTIL MODULE"
         db = get_db()
         db.text_factory = str
-        db.execute('update activity set review_status = ?, merge_status=?, merge_notes = ?, activity_status = ?, where id = ?', [1, 1, notes, 0, activity_id])
+        db.execute('update activity set review_status = ?, merge_status=?, merge_notes = ?, activity_status = ? where id = ?', [1, 1, notes, 0, activity_id])
         db.commit()
         db.close()
         return redirect("http://mpoci.portal/activity_details?act_id=" + str(activity_id))
