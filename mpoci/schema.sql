@@ -17,7 +17,6 @@ create table activity (
     updated_by text not null,
     updated_at text not null,
     notes text not null,
-    admin_response text not null,
     merge_status integer not null,
     merge_notes text not null,
     revert_status integer not null,

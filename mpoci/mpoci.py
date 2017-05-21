@@ -412,7 +412,7 @@ def update_project():
 
             files_update = ';'.join(files_update_list) + '-' + ';'.join(files_removed)
             # Update 'activity' table
-            if files_update_list:
+            if files_update_list or files_removed:
                 db = get_db()
                 db.text_factory = str
                 db.execute("update activity set revert_status = 1 where project_name = ? and updated_by = ?", [project_name, username])
@@ -423,8 +423,8 @@ def update_project():
                     #db.execute("insert into revert_activity (activity_id, project_name, branch_name, reverted_by, reverted_at) values (?, ?, ?, ?, datetime('now','localtime'))",
                     #            [activity_id, project_name, "branch-"+username, username])
                     #db.commit()
-                db.execute("insert into activity (project_name, branch_name, files_list, updated_by, updated_at, notes, admin_response, merge_status, merge_notes, revert_status, review_status, activity_status, activity_notes) values (?, ?, ?, ?, datetime('now','localtime'), ?, ?, ?, ?, ?, ?, ?, ?)",
-                            [project_name, "branch-"+username, files_update, username, notes, '-', 0, '-', 0, 0, 1, '-'])
+                db.execute("insert into activity (project_name, branch_name, files_list, updated_by, updated_at, notes, merge_status, merge_notes, revert_status, review_status, activity_status, activity_notes) values (?, ?, ?, ?, datetime('now','localtime'), ?, ?, ?, ?, ?, ?, ?)",
+                            [project_name, "branch-"+username, files_update, username, notes, 0, '-', 0, 0, 1, '-'])
                 db.commit()
                 db.close()
             # EOL
@@ -572,21 +572,34 @@ def merge():
     flag = None
     if request.method == 'POST':
         notes = request.form['merge-notes']
-        return notes
-    else:
-        return redirect(url_for('main_page'))
+        activity_id = request.form['act_id']
+        if not activity_id:
+            return redirect(url_for('main_page'))
+        return notes + str(activity_id)
+
     return redirect(url_for('main_page'))
 
-@app.route('/close_activity', methods=['GET','POST'])
-def close_activity():
+@app.route('/close_ticket', methods=['GET','POST'])
+def close_ticket():
     if not checkLogin():
         return redirect(url_for('main_page'))
     flag = None
     if request.method == 'POST':
         notes = request.form['close-notes']
-        return notes
-    else:
-        return redirect(url_for('main_page'))
+        activity_id = request.form['act_id']
+        try:
+            activity_id = int(activity_id)
+        except:
+            return redirect(url_for('main_page'))
+        if not activity_id:
+            return redirect(url_for('main_page'))
+        db = get_db()
+        db.text_factory = str
+        db.execute('update activity set review_status = ?, activity_status=?, activity_notes = ? where id = ?', [1, 0, notes, activity_id])
+        db.commit()
+        db.close()
+        return notes + str(activity_id)
+
     return redirect(url_for('main_page'))
 
 @app.route('/revert_updates', methods=['GET','POST'])
