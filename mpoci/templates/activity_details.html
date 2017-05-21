@@ -2,13 +2,66 @@
 <head>
     <title>QQDewa Continous Integration - Project Details</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='activity_details.css') }}" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="{{ url_for('js', filename='popup.js') }}"></script>
+    <script>
+    function checkEmptyMergeDiv() {
+      if (document.getElementById("merge-notes").value == "") {
+        alert("Please add some notes!");
+      } else {
+        document.forms["confirm-merge-form"].submit();
+      }
+    }
+    function showMergeDiv() {
+      document.getElementById('confirmMergeDiv').style.display = 'block';
+    }
+
+    function hideMergeDiv() {
+      document.getElementById('confirmMergeDiv').style.display = 'none';
+    }
+
+    function checkEmptyCloseDiv() {
+      if (document.getElementById("close-notes").value == "") {
+        alert("Please add some notes!");
+      } else {
+        document.forms["confirm-close-form"].submit();
+      }
+    }
+    function showCloseDiv() {
+      document.getElementById('confirmCloseDiv').style.display = 'block';
+    }
+
+    function hideCloseDiv() {
+      document.getElementById('confirmCloseDiv').style.display = 'none';
+    }
+    </script>
 </head>
 <body>
+
 <div class="activity-details-page">
   <div class="form">
-    <form class="project_details-form" action="../project_details" method="POST">
+
+    <div id="confirmMergeDiv">
+      <div id="popup-box">
+        <form action="../merge" name="confirm-merge-form" method="POST">
+          <a href="javascript:hideMergeDiv();" id="close-button">X</a><br>
+          <label for="label_notes"><h3>Notes:</h3></label>
+          <textarea rows="4" cols="30" name="merge-notes" id="merge-notes"></textarea><br><br>
+          <a href="javascript:checkEmptyMergeDiv();" id="submit-button">Merge Updates</a>&nbsp;&nbsp;
+        </form>
+      </div>
+    </div>
+
+    <div id="confirmCloseDiv">
+      <div id="popup-box">
+        <form action="../close_activity" name="confirm-close-form" method="POST">
+          <a href="javascript:hideCloseDiv();" id="close-button">X</a><br>
+          <label for="label_notes"><h3>Notes:</h3></label>
+          <textarea rows="4" cols="30" name="close-notes" id="close-notes"></textarea><br><br>
+          <a href="javascript:checkEmptyCloseDiv();" id="submit-button">Close Ticket</a><br>
+        </form>
+      </div>
+    </div>
+
+    <form class="project-details-form" action="../project_details" method="POST">
       <label for="title-form">Activity Details</label>
       <div class="access-level">
       {% if details %}
@@ -48,7 +101,8 @@
         {% if details.revert_status==0 %}
          <a href="../view_project?view=1&project_name={{ details.project_name }}&activity_id={{ details.id }}" class="action_link" target="_blank"><span class="view">View</span></a>&nbsp;&nbsp;
          {% if userlevel %}
-         <a href="javascript:showForm()" class="action_link">Merge</a>&nbsp;&nbsp;
+         <a href="javascript:showMergeDiv();" class="action_link">Merge Updates</a>&nbsp;&nbsp;
+         <a href="javascript:showCloseDiv();" class="action_link">Close Ticket</a>&nbsp;&nbsp;
          {% endif %}
           <!-- <a href="javascript:confirmRevert('../revert_updates?flag=1&act_id={{ details.id }}')" class="action_link">Revert</a> -->
          {% endif %}

@@ -565,6 +565,30 @@ def activity_details():
     else:
         return redirect(url_for('main_page'))
 
+@app.route('/merge', methods=['GET','POST'])
+def merge():
+    if not checkLogin():
+        return redirect(url_for('main_page'))
+    flag = None
+    if request.method == 'POST':
+        notes = request.form['merge-notes']
+        return notes
+    else:
+        return redirect(url_for('main_page'))
+    return redirect(url_for('main_page'))
+
+@app.route('/close_activity', methods=['GET','POST'])
+def close_activity():
+    if not checkLogin():
+        return redirect(url_for('main_page'))
+    flag = None
+    if request.method == 'POST':
+        notes = request.form['close-notes']
+        return notes
+    else:
+        return redirect(url_for('main_page'))
+    return redirect(url_for('main_page'))
+
 @app.route('/revert_updates', methods=['GET','POST'])
 def revert_updates():
     if not len(session) and 'username' not in session.keys():
