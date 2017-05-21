@@ -50,12 +50,14 @@
           <td>
             <label for="activities_list">Updated by: <span class="username">{{ activity.updated_by }}</span>, at: {{ activity.updated_at }}&nbsp;&nbsp;</label>
           </td>
-          <td>
-            <a href="../activity_details?act_id={{ activity.id }}" target="_blank" class="details_link"><span class="details">Details</span></a>
-          </td>
-          <td>
-            <a href="../view_project?view=1&project_name={{ activity.project_name }}&activity_id={{ activity.id }}" class="view_link" target="_blank" onclick="setTimeout(location.reload.bind(location), 5000);"><span class="view">View</span></a>
-          </td>
+          {% if details.project_status == 1 %}
+            <td>
+              <a href="../activity_details?act_id={{ activity.id }}" target="_blank" class="details_link"><span class="details">Details</span></a>
+            </td>
+            <td>
+              <a href="../view_project?view=1&project_name={{ activity.project_name }}&activity_id={{ activity.id }}" class="view_link" target="_blank" onclick="setTimeout(location.reload.bind(location), 5000);"><span class="view">View</span></a>
+            </td>
+          {% endif %}
           <td>
             {% if activity.merge_status==0 and activity.revert_status==0 and activity.review_status==0 %}
               <span class="new_label">New!</span>

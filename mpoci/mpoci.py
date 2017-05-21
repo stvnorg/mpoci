@@ -573,9 +573,32 @@ def merge():
     if request.method == 'POST':
         notes = request.form['merge-notes']
         activity_id = request.form['act_id']
+        try:
+            activity_id = int(activity_id)
+        except:
+            return redirect(url_for('main_page'))
         if not activity_id:
             return redirect(url_for('main_page'))
-        return notes + str(activity_id)
+        query = query_db('select project_name, updated_by from activity where id = ?',[activity_id], one=True)
+        if not query:
+            return redirect(url_for('main_page'))
+        project_name = query['project_name']
+        branch_name = 'branch-' + query['updated_by']
+        master_path = UPLOAD_FOLDER + '/' + project_name + '/master'
+        branch_path = UPLOAD_FOLDER + '/' + project_name + '/' + branch_name
+        try:
+            if os.path.isdir(master_path):
+                shutil.rmtree(master_path)
+            shutil.copytree(branch_path, master_path)
+            shutil.copystat(branch_path, master_path)
+        except:
+            return "ERROR SHUTIL MODULE"
+        db = get_db()
+        db.text_factory = str
+        db.execute('update activity set review_status = ?, merge_status=?, merge_notes = ?, activity_status = ?, where id = ?', [1, 1, notes, 0, activity_id])
+        db.commit()
+        db.close()
+        return redirect("http://mpoci.portal/activity_details?act_id=" + str(activity_id))
 
     return redirect(url_for('main_page'))
 
@@ -598,7 +621,7 @@ def close_ticket():
         db.execute('update activity set review_status = ?, activity_status=?, activity_notes = ? where id = ?', [1, 0, notes, activity_id])
         db.commit()
         db.close()
-        return notes + str(activity_id)
+        return redirect("http://mpoci.portal/activity_details?act_id=" + str(activity_id))
 
     return redirect(url_for('main_page'))
 
