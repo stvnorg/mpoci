@@ -164,18 +164,37 @@ def main_page():
     username = None
     projects = None
     admin = 1 if checkLogin() else None
+    fileList = None
+
     if request.method == 'GET':
         if len(session):
             if 'username' in session.keys():
                 username = session['username']
-                projects = query_db('select * from projects',[])
-                return render_template('main_page.html', error=error, username=username, admin=admin, projects=sortProjects(projects))
+                projects = query_db('select * from projects order by project_name',[])
+                members = query_db('select * from members where username != ? order by level',['mpociadmin'])
+                fileList = []
+
+                for project in projects:
+                    dirs, files = dirTree(UPLOAD_FOLDER + '/' + project['project_name'] + '/master')
+                    for i in range(len(files)):
+                        files[i] = re.sub(UPLOAD_FOLDER,'',files[i])
+                    fileList.append(['master',files])
+                    for m in members:
+                        branch = "branch-" + m['username']
+                        dirs, files = dirTree(UPLOAD_FOLDER + '/' + project['project_name'] + '/' + branch)
+                        for i in range(len(files)):
+                            files[i] = re.sub(UPLOAD_FOLDER,'',files[i])
+                        fileList.append([branch,files])
+                    break
+                #return str(fileList)+str(len(fileList))
+                return render_template('main_page.html', error=error, username=username, admin=admin, projects=projects, fileList=fileList, projectName=projects[0]['project_name'])
             else:
                 return redirect(url_for('login'))
         else:
             return redirect(url_for('login'))
     else:
-        return 'POST DATA'
+        project_name = request.form['dropdown_project']
+        return project_name
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
