@@ -57,19 +57,47 @@ a.logout, a.logout:visited {
   color: #490713;
 }
 a.menu-link, a.menu-link:visited {
-  display: block-inline;
   float: right;
-  border: 1px solid grey;
+  border: 1px solid #abc;
   margin: 32px 0 0 115px;
   padding: 5px 20px;
   position: absolute;
   background: #ccc;
   font-size: 0.85em;
-  color: #005587;
+  color: #233c68;
   font-weight: bold;
-  text-decoration: none;
 }
 a.menu-link:hover {
-  color: #fff;
+  color: #496799;
+  background: #ddd;
+}
+.right {
+  #border: 1px solid black;
+  width: 400px;
+  float: right;
+}
+.dropdown-menu {
+  display: none;
+  text-align: right;
+  float: right;
+  padding: 0;
+  width: 150px;
+  height: 100%;
+  padding-right: 5px;
+  #border: 1px solid grey;
+}
+a.dropdown-link, a.dropdown-link:visited {
+  border: 1px solid #abc;
+  display: inline-block;
+  width: 90px;
+  margin-right: -5px;
+  padding: 5px 20px;
   background: #ccc;
+  font-size: 0.8em;
+  color: #233c68;
+  text-decoration: none;
+}
+a.dropdown-link:hover {
+  color: #496799;
+  background: #ddd;
 }

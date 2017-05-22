@@ -147,10 +147,11 @@ def dirTree(dir_path):
 def main_page():
     error = None
     username = None
+    admin = 1 if checkLogin() else None
     if len(session):
         if 'username' in session.keys():
             username = session['username']
-            return render_template('main_page.html', error=error, username=username)
+            return render_template('main_page.html', error=error, username=username, admin=admin)
         else:
             return redirect(url_for('login'))
     else:

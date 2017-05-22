@@ -7,6 +7,14 @@
       function reloadURL() {
         setTimeout(location.reload.bind(location), 5000);
       }
+      function rolloverDropdown(showhide) {
+        var dropdownObj = document.getElementById("dropdown");
+        if (showhide==0) {
+          dropdownObj.style.display = 'none';
+        } else {
+          dropdownObj.style.display = 'block';
+        }
+      }
     </script>
 </head>
 <body>
@@ -17,12 +25,24 @@
       {% if username %}
         <label for="username">Hi {{ username.capitalize() }}, &nbsp;&nbsp;<a href="../logout?flag=1" class="logout">Logout</a></label><br>
       {% endif %}
-      <a href="#" class="menu-link">MENU</a>
+      <a href="#" class="menu-link" onmouseover="rolloverDropdown(1);">MENU</a>
     </div>
   </div>
   <div class="left">
   </div>
   <div class="right">
+    <div class="dropdown-menu" id="dropdown" onmouseover="rolloverDropdown(1);" onmouseout="rolloverDropdown(0)">
+      {% if admin %}
+        <a href="../add_project" target="_blank" class="dropdown-link" onmouseout="hideDropdown();">Add Project</a>
+        <a href="../update_project" target="_blank" class="dropdown-link" onmouseout="hideDropdown();">Update Project</a>
+        <a href="../merge_history" target="_blank" class="dropdown-link">Merge History</a>
+        <a href="../new_member" target="_blank" class="dropdown-link">Add User</a>
+        <a href="../edit_member" target="_blank" class="dropdown-link">Edit User</a>
+      {% else %}
+        <a href="../update_project" target="_blank" class="dropdown-link">Update Project</a>
+        <a href="../merge_history" target="_blank" class="dropdown-link">Merge History</a>
+      {% endif %}
+    </div>
   </div>
 </div>
 </body>
