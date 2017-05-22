@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<meta http-equiv="refresh" content="30"/>
+<head>
+    <title>MPOTech Continous Integration - Main Page</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main_page.css') }}" />
+    <script type="text/javascript">
+      function reloadURL() {
+        setTimeout(location.reload.bind(location), 5000);
+      }
+    </script>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <label for="logo-name">MPOTech Collaboration Portal</label>
+    <div class="menu-header">
+      {% if username %}
+        <label for="username">Hi {{ username.capitalize() }}, &nbsp;&nbsp;<a href="../logout?flag=1" class="logout">Logout</a></label><br>
+      {% endif %}
+      <a href="#" class="menu-link">MENU</a>
+    </div>
+  </div>
+  <div class="left">
+  </div>
+  <div class="right">
+  </div>
+</div>
+</body>
+</html>

@@ -93,12 +93,64 @@ def checkLogin():
             return access['level']=='admin'
     return False
 
+def projectNameValidation(name):
+    result = re.search(r'\w+',name,re.M|re.I)
+    return len(result.group()) == len(name)
+
+def sortActivity(activity):
+    A = [i for i in activity]
+    i = 0
+    n = 2 if len(A) > 2 else 1
+    while i < len(A)-n:
+        Ax = A[i]['updated_at'].split(' ')
+        Ay = A[i+1]['updated_at'].split(' ')
+        Ax = Ax[0].split('-')+Ax[1].split(':')
+        Ay = Ay[0].split('-')+Ay[1].split(':')
+        Ax = [int(j) for j in Ax]
+        Ay = [int(j) for j in Ay]
+        Ax = datetime(Ax[0],Ax[1],Ax[2],Ax[3],Ax[4],Ax[5])
+        Ay = datetime(Ay[0],Ay[1],Ay[2],Ay[3],Ay[4],Ay[5])
+
+        if Ax < Ay:
+            A[i],A[i+1] = A[i+1], A[i]
+        if i != 0:
+            i -= 1
+        else:
+            i += 1
+    return A
+
+def dirTree(dir_path):
+
+    DIRECTORY = [dir_path+'/']
+    files_list = []
+
+    dir = True
+
+    while dir:
+        for i in range(len(DIRECTORY)):
+            result = os.listdir(DIRECTORY[i])
+            for r in result:
+                tmp = DIRECTORY[i] + r + '/'
+                if os.path.isdir(tmp):
+                    if tmp not in DIRECTORY:
+                        DIRECTORY.append(tmp)
+                else:
+                    tmp = tmp.rstrip('/')
+                    if tmp not in files_list:
+                        files_list.append(tmp)
+
+            if i == len(DIRECTORY)-1:
+                dir = False
+    return (DIRECTORY, files_list)
+
 @app.route('/')
 def main_page():
+    error = None
+    username = None
     if len(session):
         if 'username' in session.keys():
             username = session['username']
-            return 'Hi ' + username
+            return render_template('main_page.html', error=error, username=username)
         else:
             return redirect(url_for('login'))
     else:
@@ -222,10 +274,6 @@ def edit_member():
     else:
         return render_template('edit_member.html', members=query)
 
-def projectNameValidation(name):
-    result = re.search(r'\w+',name,re.M|re.I)
-    return len(result.group()) == len(name)
-
 @app.route('/add_project', methods=['GET','POST'])
 def add_project():
     error = None
@@ -297,30 +345,6 @@ def add_project():
             return redirect(url_for('main_page'))
 
     return render_template('add_project.html', error=error)
-
-def dirTree(dir_path):
-
-    DIRECTORY = [dir_path+'/']
-    files_list = []
-
-    dir = True
-
-    while dir:
-        for i in range(len(DIRECTORY)):
-            result = os.listdir(DIRECTORY[i])
-            for r in result:
-                tmp = DIRECTORY[i] + r + '/'
-                if os.path.isdir(tmp):
-                    if tmp not in DIRECTORY:
-                        DIRECTORY.append(tmp)
-                else:
-                    tmp = tmp.rstrip('/')
-                    if tmp not in files_list:
-                        files_list.append(tmp)
-
-            if i == len(DIRECTORY)-1:
-                dir = False
-    return (DIRECTORY, files_list)
 
 @app.route('/update_project', methods=['GET', 'POST'])
 def update_project():
@@ -444,28 +468,6 @@ def project_details(name=None):
     activities = []
     username = session['username']
     userlevel = 1 if checkLogin() else None
-
-    def sortActivity(activity):
-        A = [i for i in activity]
-        i = 0
-        n = 2 if len(A) > 2 else 1
-        while i < len(A)-n:
-            Ax = A[i]['updated_at'].split(' ')
-            Ay = A[i+1]['updated_at'].split(' ')
-            Ax = Ax[0].split('-')+Ax[1].split(':')
-            Ay = Ay[0].split('-')+Ay[1].split(':')
-            Ax = [int(j) for j in Ax]
-            Ay = [int(j) for j in Ay]
-            Ax = datetime(Ax[0],Ax[1],Ax[2],Ax[3],Ax[4],Ax[5])
-            Ay = datetime(Ay[0],Ay[1],Ay[2],Ay[3],Ay[4],Ay[5])
-
-            if Ax < Ay:
-                A[i],A[i+1] = A[i+1], A[i]
-            if i != 0:
-                i -= 1
-            else:
-                i += 1
-        return A
 
     if request.method == 'GET':
         if name:

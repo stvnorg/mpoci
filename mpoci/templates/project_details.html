@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <meta http-equiv="refresh" content="30"/>
 <head>
-    <title>QQDewa Continous Integration - Project Details</title>
+    <title>MPOTech Continous Integration - Project Details</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='project_details.css') }}" />
     <script type="text/javascript">
       function reloadURL() {
@@ -27,9 +27,9 @@
       <div class="access-level">
       {% if details %}
         {% if details.project_status %}
-        <label for="project_name">Project Name: <a href="http://qqdewa.test/{{ details.project_name }}/master" target="_blank"><strong>{{ details.project_name.upper() }}</strong></a> -- </label>
+        <label for="project_name">Project Name: <a href="http://qqdewa.test/{{ details.project_name }}/master" target="_blank"><strong>{{ details.project_name.upper() }}</strong></a> -- <a href="../update_project" class="upload-link"/>&nbsp;&lt; Upload &gt;</a></label><br>
         {% else %}
-        <label for="project_name">Project Name: <strong><span name="disabled-project">{{ details.project_name.upper() }}</span></strong> -- </label>
+        <label for="project_name">Project Name: <strong><span name="disabled-project">{{ details.project_name.upper() }}</span></strong> -- </label><br>
         {% endif %}
       <label for="project_created">Created by <span class="username">{{ details.created_by }}</span>, at {{ details.created_at }}</label><br><br>
       <label for="label_header">Description:</label><br>

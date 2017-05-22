@@ -1,0 +1,75 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto:300);
+@import url(https://fonts.googleapis.com/css?family=Teko);
+
+body {
+  background: #76b852; /* fallback for old browsers */
+  background: -webkit-linear-gradient(right, #76b852, #8DC26F);
+  background: -moz-linear-gradient(right, #76b852, #8DC26F);
+  background: -o-linear-gradient(right, #76b852, #8DC26F);
+  background: linear-gradient(to left, #76b852, #8DC26F);
+  font-family: "Roboto", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.container {
+  margin: 1% auto;
+  display: block;
+  width: 800px;
+  height: 600px;
+  border-radius: 5px;
+  box-shadow: 1px 1px 5px 0.5px #ccc;
+  background: #fff;
+}
+.header {
+  display: block;
+  margin: 0 auto;
+  width: 800px;
+  height: 80px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  box-shadow: 0px 1px 5px 0.5px #ccc;
+  background: #fcc456;
+}
+label[for="logo-name"] {
+  font-family: "Teko", sans-serif;
+  font-size: 1.5em;
+  display: block-inline;
+  margin: 25px auto;
+  padding: 20px 20px 0 15px;
+  position: absolute;
+  #border: 1px solid grey;
+}
+.menu-header {
+  display: block;
+  width: 200px;
+  height: 80px;
+  background: #fcc456;
+  #border: 1px solid grey;
+  float: right;
+}
+label[for="username"] {
+  display: block;
+  float: right;
+  padding: 5px 10px;
+  font-size: 0.8em;
+}
+a.logout, a.logout:visited {
+  color: #490713;
+}
+a.menu-link, a.menu-link:visited {
+  display: block-inline;
+  float: right;
+  border: 1px solid grey;
+  margin: 32px 0 0 115px;
+  padding: 5px 20px;
+  position: absolute;
+  background: #ccc;
+  font-size: 0.85em;
+  color: #005587;
+  font-weight: bold;
+  text-decoration: none;
+}
+a.menu-link:hover {
+  color: #fff;
+  background: #ccc;
+}

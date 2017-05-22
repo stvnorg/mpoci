@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <head>
-    <title>QQDewa Continous Integration - Login Page</title>
+    <title>MPOTech Continous Integration - Login Page</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='login.css') }}" />
 </head>
 <body>
@@ -14,7 +14,7 @@
       <p class="message">Already registered? <a href="#">Sign In</a></p>
     </form>
     <form class="login-form" action="../login" method="POST">
-      <label for="title-form">QQDewa Continous Integration</label>
+      <label for="title-form">MPOTech Collaboration Portal</label>
       <input type="text" placeholder="username" name="username" value="{{ request.form.username }}" />
       <input type="password" placeholder="password" name="password" value="{{ request.form.password }}" />
       {% if error %}
