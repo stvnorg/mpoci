@@ -97,6 +97,21 @@ def projectNameValidation(name):
     result = re.search(r'\w+',name,re.M|re.I)
     return len(result.group()) == len(name)
 
+def sortProjects(projects):
+    P = [i for i in projects]
+    i = 0
+    n = 2 if len(P) > 2 else 1
+    while i < len(P)-n:
+        x = P[i]['project_name']
+        y = P[i+1]['project_name']
+        if x > y:
+            P[i],P[i+1] = P[i+1],P[i]
+        if i != 0:
+            i -= 1
+        else:
+            i += 1
+    return P
+
 def sortActivity(activity):
     A = [i for i in activity]
     i = 0
@@ -143,19 +158,24 @@ def dirTree(dir_path):
                 dir = False
     return (DIRECTORY, files_list)
 
-@app.route('/')
+@app.route('/', methods=['GET','POST'])
 def main_page():
     error = None
     username = None
+    projects = None
     admin = 1 if checkLogin() else None
-    if len(session):
-        if 'username' in session.keys():
-            username = session['username']
-            return render_template('main_page.html', error=error, username=username, admin=admin)
+    if request.method == 'GET':
+        if len(session):
+            if 'username' in session.keys():
+                username = session['username']
+                projects = query_db('select * from projects',[])
+                return render_template('main_page.html', error=error, username=username, admin=admin, projects=sortProjects(projects))
+            else:
+                return redirect(url_for('login'))
         else:
             return redirect(url_for('login'))
     else:
-        return redirect(url_for('login'))
+        return 'POST DATA'
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():

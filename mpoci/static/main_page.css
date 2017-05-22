@@ -71,16 +71,34 @@ a.menu-link:hover {
   color: #496799;
   background: #ddd;
 }
+
+.left {
+  display: block;
+  float: left;
+  margin: 5px 0 5px 5px;
+  border: 1px solid #ddd;
+  width: 390px;
+  height: 500px;
+  background: #eee;
+}
+label[for="project-name"] {
+  font-size: 0.7em;
+}
+
 .right {
-  #border: 1px solid black;
-  width: 400px;
+  display: block;
   float: right;
+  margin: 5px 5px 0 5px;
+  border: 1px solid #ddd;
+  width: 390px;
+  height: 500px;
 }
 .dropdown-menu {
   display: none;
   text-align: right;
   float: right;
   padding: 0;
+  margin-top: -6px;
   width: 150px;
   height: 100%;
   padding-right: 5px;

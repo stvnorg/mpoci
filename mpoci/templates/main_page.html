@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<meta http-equiv="refresh" content="30"/>
 <head>
+  <meta http-equiv="refresh" content="30">
     <title>MPOTech Continous Integration - Main Page</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main_page.css') }}" />
     <script type="text/javascript">
@@ -14,6 +14,9 @@
         } else {
           dropdownObj.style.display = 'block';
         }
+      }
+      function selectProject() {
+        document.getElementById('main-form').submit();
       }
     </script>
 </head>
@@ -29,18 +32,30 @@
     </div>
   </div>
   <div class="left">
+    <form name="main-form" id="main-form" method='POST' action="../">
+      <select name="dropdown_project" onchange="selectProject();">
+        {% if projects %}
+          {% for project in projects %}
+            <option value="{{ project.project_name }}">{{ project.project_name }}</option>
+          {% endfor %}
+        {% else %}
+          <option value="">--</option>
+        {% endif %}
+      </select>
+      <label for="project-name">Project Name</label>
+    </form>
   </div>
   <div class="right">
     <div class="dropdown-menu" id="dropdown" onmouseover="rolloverDropdown(1);" onmouseout="rolloverDropdown(0)">
       {% if admin %}
-        <a href="../add_project" target="_blank" class="dropdown-link" onmouseout="hideDropdown();">Add Project</a>
-        <a href="../update_project" target="_blank" class="dropdown-link" onmouseout="hideDropdown();">Update Project</a>
-        <a href="../merge_history" target="_blank" class="dropdown-link">Merge History</a>
-        <a href="../new_member" target="_blank" class="dropdown-link">Add User</a>
-        <a href="../edit_member" target="_blank" class="dropdown-link">Edit User</a>
+        <a href="../add_project" class="dropdown-link">Add Project</a>
+        <a href="../update_project" class="dropdown-link">Update Project</a>
+        <a href="../merge_history" class="dropdown-link">Merge History</a>
+        <a href="../new_member" class="dropdown-link">Add User</a>
+        <a href="../edit_member" class="dropdown-link">Edit User</a>
       {% else %}
-        <a href="../update_project" target="_blank" class="dropdown-link">Update Project</a>
-        <a href="../merge_history" target="_blank" class="dropdown-link">Merge History</a>
+        <a href="../update_project" class="dropdown-link">Update Project</a>
+        <a href="../merge_history" class="dropdown-link">Merge History</a>
       {% endif %}
     </div>
   </div>
