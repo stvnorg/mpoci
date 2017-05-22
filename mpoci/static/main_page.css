@@ -82,8 +82,16 @@ a.menu-link:hover {
   height: 100%;
   background: #eee;
 }
-label[for="project-name"] {
-  font-size: 0.7em;
+form[name='main-form'] {
+  margin: 10px 0 0 10px;
+}
+.details-link {
+  display: inline-block;
+  padding: 5px 10px 3px 10px;
+  font-size: 0.8em;
+  color: #4f0408;
+  background: #ddd;
+  text-decoration: none;
 }
 .files-list-div {
   margin: 10px 0 0 10px;

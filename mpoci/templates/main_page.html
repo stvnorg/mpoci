@@ -36,13 +36,17 @@
       <select name="dropdown_project" onchange="selectProject();">
         {% if projects %}
           {% for project in projects %}
-            <option value="{{ project.project_name }}">{{ project.project_name }}</option>
+            {% if projectName == project.project_name %}
+              <option value="{{ project.project_name }}" selected="selected">{{ project.project_name }}</option>
+            {% else %}
+              <option value="{{ project.project_name }}">{{ project.project_name }}</option>
+            {% endif %}
           {% endfor %}
         {% else %}
           <option value="">--</option>
         {% endif %}
       </select>
-      <label for="project-name">Project Name</label>
+      <a href="../project_details?name={{ projectName }}" class="details-link">Details</a>
     </form>
     <div class="files-list-div">
       {% if fileList %}

@@ -42,13 +42,13 @@ label[for="label_header"] {
   color: #111;
 }
 label[for="project_description"] {
-  display: block-inline;
+  display: inline-block;
   font-size: 0.8em;
   padding: 10px;
   color: #111;
 }
 label[for="files_structure"] {
-  display: block-inline;
+  display: inline-block;
   font-size: 0.75em;
   padding-left: 10px;
   color: #0067fa;
@@ -159,7 +159,7 @@ a.upload-link, a.upload-link:visited {
   margin: 10px 0 0 0;
 }
 a.disable_link, a.disable_link:visited {
-  display: block-inline;
+  display: inline-block;
   padding: 5px 10px;
   font-size: 0.75em;
   color: #4f0408;
