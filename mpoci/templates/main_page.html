@@ -2,6 +2,7 @@
 <head>
   <meta http-equiv="refresh" content="30">
     <title>MPOTech Continous Integration - Main Page</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main_page.css') }}" />
     <script type="text/javascript">
       function reloadURL() {
@@ -28,7 +29,7 @@
       {% if username %}
         <label for="username">Hi {{ username.capitalize() }}, &nbsp;&nbsp;<a href="../logout?flag=1" class="logout">Logout</a></label><br>
       {% endif %}
-      <a href="#" class="menu-link" onmouseover="rolloverDropdown(1);">MENU</a>
+      <a href="#" class="menu-link" onmouseover="rolloverDropdown(1);" onmouseout="rolloverDropdown(0);">MENU</a>
     </div>
   </div>
   <div class="left">
@@ -46,7 +47,7 @@
           <option value="">--</option>
         {% endif %}
       </select>
-      <a href="../project_details?name={{ projectName }}" class="details-link">Details</a>
+      <a href="../project_details?name={{ projectName }}" class="details-link" target="_blank">Details</a>
     </form>
     <div class="files-list-div">
       {% if fileList %}
