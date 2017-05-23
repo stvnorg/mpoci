@@ -549,7 +549,7 @@ def project_details(name=None):
             files[i] = re.sub(UPLOAD_FOLDER,'',files[i])
         query = query_db('select * from members',[])
         for q in query:
-            name_activity = query_db('select * from activity where project_name = ? and updated_by = ?',[project_name, q['username']], one=True)
+            name_activity = query_db('select * from activity where project_name = ? and updated_by = ? order by updated_at desc',[project_name, q['username']], one=True)
             if name_activity:
                 activities.append(name_activity)
         return render_template('project_details.html', details=details, files=dirs+files, activities=sortActivity(activities), userlevel=userlevel)

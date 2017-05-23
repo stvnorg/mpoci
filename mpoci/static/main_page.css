@@ -118,17 +118,18 @@ a.project-link, a.project-link:visited {
   display: block;
   float: right;
   margin: 5px 5px 0 5px;
-  border: 1px solid #ddd;
+  #border: 2px solid #ddd;
   width: 380px;
-  height: 500px;
+  height: 100%;
 }
 .dropdown-menu {
   display: none;
+  z-index: 1;
+  position: absolute;
   text-align: right;
   float: right;
-  padding: 0;
-  margin-top: -6px;
-  margin-right: -6px;
+  margin-top: -8px;
+  right: 105px;
   width: 150px;
   height: 100%;
   padding-right: 5px;
@@ -150,15 +151,18 @@ a.dropdown-link:hover {
   background: #ddd;
 }
 label[for="project_name"] {
-  display: inline-block;
+  display: block;
   padding: 10px;
+  border: 1px solid #345;
   font-size: 0.9em;
-  color: #111;
+  color: #eee;
+  background: #345;
 }
 .activity_div {
   display: block;
   padding: 10px 0 10px 20px;
-  border: 1px solid #eee;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
 }
 label[for="project_updated"] {
   display: inline-block;
@@ -173,4 +177,19 @@ label[for="project_updated"] {
 .status {
   font-size: 1em;
   color: red;
+}
+a.action_link, a.action_link:visited {
+  display: inline-block;
+  margin-top: 5px;
+  padding: 3px 10px;
+  font-size: 0.9em;
+  color: #4f0408;
+  background: #ccc;
+  text-decoration: none;
+}
+.right-bottom {
+  display: block;
+  margin: 10px auto;
+  width: 100%;
+  height: 50px;
 }

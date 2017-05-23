@@ -75,23 +75,27 @@
         <a href="../merge_history" class="dropdown-link">Merge History</a>
       {% endif %}
     </div>
+    <label for="project_name">Activities for project: - <strong>{{ projectName }}</strong> -</label>
     {% if activities %}
-    <label for="project_name">Activities for project <strong>{{ projectName }}</strong> </label>
       {% for act in activities %}
         <div class="activity_div">
           <label for="project_updated">Updated by <span class="username">{{ act.updated_by }}</span>, at {{ act.updated_at }}</label><br>
           <label for="project_updated">Status:
            {% if act.merge_status == 1%}
-            <span class="status">Merged</span>
+            <span class="status">Merged</span><br>
            {% elif act.review_status == 1 and act.merge_status == 0 %}
-            <span class="status">Viewed</span>
+            <span class="status">Viewed</span><br>
            {% else %}
-            <span class="status">New!</span>
+            <span class="status">New!</span><br>
            {% endif %}
+           <a href="../view_project?view=1&project_name={{ act.project_name }}&activity_id={{ act.id }}" class="action_link" target="_blank"><span class="view">View</span></a>&nbsp;&nbsp;
+           <a href="../activity_details?act_id={{ act.id }}" target="_blank" class="action_link"><span class="details">Details</span></a>
          </label>
         </div>
       {% endfor %}
     {% endif %}
+    <div class="right-bottom">
+    </div>
   </div>
 </div>
 </body>

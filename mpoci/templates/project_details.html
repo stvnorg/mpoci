@@ -35,7 +35,7 @@
       <label for="project_created">Created by <span class="username">{{ details.created_by }}</span>, at {{ details.created_at }}</label><br><br>
       <label for="label_header">Description:</label><br>
       <label for="project_description">{{ details.description }}</label><br><br>
-      <label for="label_header">Files:</label><br>
+      <label for="label_header">Master Files:</label><br>
         {% if files %}
          {% for file in files %}
           <label for="files_structure">{{ file }}</label><br>

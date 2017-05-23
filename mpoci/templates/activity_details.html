@@ -98,7 +98,7 @@
         <label for="label_header">Reply:</label><br>
         <label for="update_notes">{{ details.activity_notes }}</label><br><br>
       {% endif %}
-      <label for="label_header">Files:</label><br>
+      <label for="label_header">Files in branch-{{ details.updated_by }}:</label><br>
         {% if files %}
          {% for file in files %}
           <label for="files_structure">{{ file }}</label><br>
