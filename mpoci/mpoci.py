@@ -179,21 +179,26 @@ def main_page():
                 members = query_db('select * from members where username != ? order by level',['mpociadmin'])
                 fileList = []
 
-                for project in projects:
-                    dirs, files = dirTree(UPLOAD_FOLDER + '/' + project['project_name'] + '/master')
+                if 'project_name' in session.keys():
+                    project_name = session['project_name']
+                    projectName = project_name
+                elif projects:
+                    projectName = projects[0]['project_name']
+
+                dirs, files = dirTree(UPLOAD_FOLDER + '/' + projectName + '/master')
+                for i in range(len(files)):
+                    files[i] = re.sub(UPLOAD_FOLDER,'',files[i])
+                fileList.append(['master',files])
+                for m in members:
+                    branch = "branch-" + m['username']
+                    dirs, files = dirTree(UPLOAD_FOLDER + '/' + projectName + '/' + branch)
                     for i in range(len(files)):
                         files[i] = re.sub(UPLOAD_FOLDER,'',files[i])
-                    fileList.append(['master',files])
-                    for m in members:
-                        branch = "branch-" + m['username']
-                        dirs, files = dirTree(UPLOAD_FOLDER + '/' + project['project_name'] + '/' + branch)
-                        for i in range(len(files)):
-                            files[i] = re.sub(UPLOAD_FOLDER,'',files[i])
-                        fileList.append([branch,files])
-                    activities = query_db('select * from activity where project_name = ? and revert_status = 0 and merge_status != 2 order by updated_at desc limit 10', [project['project_name']])
-                    break
+                    fileList.append([branch,files])
+                activities = query_db('select * from activity where project_name = ? and revert_status = 0 and merge_status != 2 order by updated_at desc limit 10', [projectName])
+
                 #return str(fileList)+str(len(fileList))
-                return render_template('main_page.html', error=error, username=username, admin=admin, projects=projects, fileList=fileList, projectName=projects[0]['project_name'], activities=activities)
+                return render_template('main_page.html', error=error, username=username, admin=admin, projects=projects, fileList=fileList, projectName=projectName, activities=activities)
             else:
                 return redirect(url_for('login'))
         else:
@@ -203,6 +208,7 @@ def main_page():
             if 'username' in session.keys():
                 username = session['username']
                 project_name = request.form['dropdown_project']
+                session['project_name'] = project_name
                 projects = query_db('select * from projects order by project_name',[])
                 members = query_db('select * from members where username != ? order by level',['mpociadmin'])
                 fileList = []
@@ -247,6 +253,7 @@ def logout():
         try:
             if int(flag)==1:
                 session.pop('username', None)
+                session.pop('project_name', None)
                 return redirect(url_for('login'))
             else:
                 return redirect(url_for('main_page'))
