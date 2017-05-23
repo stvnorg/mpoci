@@ -166,6 +166,7 @@ def main_page():
     admin = 1 if checkLogin() else None
     fileList = None
     projectName = None
+    activities = None
 
     if request.method == 'GET':
         if len(session):
@@ -186,9 +187,10 @@ def main_page():
                         for i in range(len(files)):
                             files[i] = re.sub(UPLOAD_FOLDER,'',files[i])
                         fileList.append([branch,files])
+                    activities = query_db('select * from activity where project_name = ? and revert_status = 0 and merge_status != 2 order by updated_at desc limit 10', [project['project_name']])
                     break
                 #return str(fileList)+str(len(fileList))
-                return render_template('main_page.html', error=error, username=username, admin=admin, projects=projects, fileList=fileList, projectName=projects[0]['project_name'])
+                return render_template('main_page.html', error=error, username=username, admin=admin, projects=projects, fileList=fileList, projectName=projects[0]['project_name'], activities=activities)
             else:
                 return redirect(url_for('login'))
         else:
@@ -211,7 +213,8 @@ def main_page():
                     for i in range(len(files)):
                         files[i] = re.sub(UPLOAD_FOLDER,'',files[i])
                     fileList.append([branch,files])
-                return render_template('main_page.html', error=error, username=username, admin=admin, projects=projects, fileList=fileList, projectName=project_name)
+                activities = query_db('select * from activity where project_name = ? and revert_status = 0 and merge_status != 2 order by updated_at desc limit 10', [project_name])
+                return render_template('main_page.html', error=error, username=username, admin=admin, projects=projects, fileList=fileList, projectName=project_name, activities=activities)
     return render_template('main_page.html', error=error)
 
 @app.route('/login', methods=['POST', 'GET'])

@@ -21,7 +21,7 @@ label[for="title-form"] {
   padding: 0 0 5% 0;
 }
 label[for="project_name"] {
-  display: block-inline;
+  display: inline-block;
   font-size: 0.9em;
   color: #111;
 }
@@ -32,30 +32,30 @@ span[name="disabled-project"] {
   text-decoration: line-through;
 }
 label[for="project_updated"] {
-  display: block-inline;
+  display: inline-block;
   font-size: 0.8em;
   color: #022866;
 }
 label[for="label_header"] {
-  display: block-inline;
+  display: inline-block;
   font-size: 0.9em;
   color: #111;
 }
 label[for="update_notes"] {
-  display: block-inline;
+  display: inline-block;
   padding: 10px;
   font-size: 0.8em;
   font-style: italic;
   color: #333;
 }
 label[for="files_structure"] {
-  display: block-inline;
+  display: inline-block;
   font-size: 0.75em;
   padding-left: 10px;
   color: #0067fa;
 }
 label[for="activities_list"] {
-  display: block-inline;
+  display: inline-block;
   font-size: 0.75em;
   padding-left: 10px;
   color: #0067fa;
