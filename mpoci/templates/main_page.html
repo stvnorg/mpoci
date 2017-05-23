@@ -54,7 +54,7 @@
             {% if file[1][i] %}
               <label for="files">{{ file[1][i] }}</label><br>
             {% endif %}
-          {% endfor %} <label for="dot">................</label> <br>
+          {% endfor %} <label for="files">/{{ projectName }}/{{ file[0] }}/.......</label><br><br>
         {% endfor %}
       {% endif %}
     </div>
@@ -78,8 +78,8 @@
         <div class="activity_div">
           <label for="project_updated">Updated by <span class="username">{{ act.updated_by }}</span>, at {{ act.updated_at }}</label><br>
           <label for="project_updated">Status:
-           {% if act.merge_status == 1%}
-            <span class="status">MERGED</span><br>
+           {% if act.merge_status == 1 %}
+            <span class="status">MERGED!</span><br>
            {% elif act.review_status == 1 and act.merge_status == 0 %}
             <span class="status">VIEWED</span><br>
            {% else %}

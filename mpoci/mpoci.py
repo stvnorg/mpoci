@@ -552,7 +552,7 @@ def project_details(name=None):
         for i in range(len(files)):
             files[i] = re.sub(UPLOAD_FOLDER,'',files[i])
 
-        activities = query_db('select * from activity where project_name = ? order by updated_at limit 20', [project_name])
+        activities = query_db('select * from activity where project_name = ? order by updated_at desc limit 20', [project_name])
         #query = query_db('select * from members where username != ?',['mpociadmin'])
         #for q in query:
         #    name_activity = query_db('select * from activity where project_name = ? and updated_by = ? order by updated_at', [project_name, q['username']], one=True)

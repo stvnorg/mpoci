@@ -133,7 +133,6 @@ a.project-link, a.project-link:visited {
   width: 150px;
   height: 100%;
   padding-right: 5px;
-  #border: 1px solid grey;
 }
 a.dropdown-link, a.dropdown-link:visited {
   border: 1px solid #abc;
@@ -162,7 +161,7 @@ label[for="project_name"] {
   display: block;
   padding: 10px 0 10px 20px;
   border-top: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
+  #border-bottom: 1px solid #ddd;
 }
 label[for="project_updated"] {
   display: inline-block;
@@ -177,6 +176,7 @@ label[for="project_updated"] {
 .status {
   font-family: monospace;
   font-size: 1.1em;
+  font-weight: bold;
   color: #111;
 }
 .new-status {
