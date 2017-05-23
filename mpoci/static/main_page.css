@@ -175,7 +175,14 @@ label[for="project_updated"] {
   font-weight: bold;
 }
 .status {
-  font-size: 1em;
+  font-family: monospace;
+  font-size: 1.1em;
+  color: #111;
+}
+.new-status {
+  font-family: monospace;
+  font-size: 1.1em;
+  font-weight: bold;
   color: red;
 }
 a.action_link, a.action_link:visited {

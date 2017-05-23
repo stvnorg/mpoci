@@ -1,13 +1,10 @@
 <!DOCTYPE html>
 <head>
-  <meta http-equiv="refresh" content="30">
+  <meta http-equiv="refresh" content="60">
     <title>MPOTech Continous Integration - Main Page</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main_page.css') }}" />
     <script type="text/javascript">
-      function reloadURL() {
-        setTimeout(location.reload.bind(location), 5000);
-      }
       function rolloverDropdown(showhide) {
         var dropdownObj = document.getElementById("dropdown");
         if (showhide==0) {
@@ -82,11 +79,11 @@
           <label for="project_updated">Updated by <span class="username">{{ act.updated_by }}</span>, at {{ act.updated_at }}</label><br>
           <label for="project_updated">Status:
            {% if act.merge_status == 1%}
-            <span class="status">Merged</span><br>
+            <span class="status">MERGED</span><br>
            {% elif act.review_status == 1 and act.merge_status == 0 %}
-            <span class="status">Viewed</span><br>
+            <span class="status">VIEWED</span><br>
            {% else %}
-            <span class="status">New!</span><br>
+            <span class="new-status">NEW!</span><br>
            {% endif %}
            <a href="../view_project?view=1&project_name={{ act.project_name }}&activity_id={{ act.id }}" class="action_link" target="_blank"><span class="view">View</span></a>&nbsp;&nbsp;
            <a href="../activity_details?act_id={{ act.id }}" target="_blank" class="action_link"><span class="details">Details</span></a>

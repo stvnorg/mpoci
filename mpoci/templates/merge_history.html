@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<head>
+    <title>MPOTech Continous Integration - Merge History</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='merge_history.css') }}" />
+    <script type="text/javascript">
+      function confirmDelete(delURL, username) {
+        if (confirm("Are you sure want to delete user ".concat(username.toUpperCase()).concat(" ?"))) {
+          document.location = delURL;
+        }
+      }
+    </script>
+
+</head>
+<body>
+<div class="form">
+  <form class="merge-history-form" action="../merge_history" method="POST">
+  <label for="title-form">Merge History</label>
+  <table class="merge-list" style="width:100%">
+    <tr>
+      <th>No.</th>
+      <th>Project Name</th>
+      <th>Updated By</th>
+      <th>Updated At</th>
+      <th>Status</th>
+      <th colspan="2"></th>
+    </tr>
+    {% set number = [1] %}
+    {% for history in mergeHistory %}
+      {% if history.updated_by != 'mpociadmin' %}
+      <tr>
+        <td>{{ number[0] }}</td>
+        {% if number.append(number.pop()+1) %}{% endif %}
+        <td>{{ history.project_name }}</td>
+        <td>{{ history.updated_by }}</td>
+        <td>{{ history.updated_at }}</td>
+        <td>MERGED</td>
+        <td><a href="../activity_details?act_id={{ history.id }}" target="_blank" class="action_link"><span class="details">Details</span></a></td>
+      </tr>
+      {% endif %}
+    {% endfor %}
+  </table>
+
+  </form>
+</div>
+</body>
+</html>

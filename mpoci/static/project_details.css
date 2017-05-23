@@ -54,7 +54,7 @@ label[for="files_structure"] {
   color: #0067fa;
 }
 label[for="activities_list"] {
-  display: block-inline;
+  display: inline-block;
   font-size: 0.75em;
   padding-left: 10px;
   color: #0067fa;

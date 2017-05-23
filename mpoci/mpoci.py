@@ -4,6 +4,7 @@ import filecmp
 import re
 from datetime import datetime
 import sqlite3
+import time
 from Crypto.Cipher import AES
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 from werkzeug.utils import secure_filename
@@ -23,6 +24,8 @@ app.config.update(dict(
     PASSWORD = 'default'
 ))
 app.config.from_envvar('MPOCI_SETTINGS', silent=True)
+
+#http_server = WSGIServer(('', 5000), app)
 
 def connect_db():
     """Connects to the specific database."""
@@ -503,12 +506,6 @@ def update_project():
                 db.text_factory = str
                 db.execute("update activity set revert_status = 1 where project_name = ? and updated_by = ?", [project_name, username])
                 db.commit()
-                query = query_db('select * from activity where project_name = ? and updated_by = ?', [project_name, username])
-                for q in query:
-                    activity_id = q['id']
-                    #db.execute("insert into revert_activity (activity_id, project_name, branch_name, reverted_by, reverted_at) values (?, ?, ?, ?, datetime('now','localtime'))",
-                    #            [activity_id, project_name, "branch-"+username, username])
-                    #db.commit()
                 db.execute("insert into activity (project_name, branch_name, files_list, updated_by, updated_at, notes, merge_status, merge_notes, revert_status, review_status, activity_status, activity_notes) values (?, ?, ?, ?, datetime('now','localtime'), ?, ?, ?, ?, ?, ?, ?)",
                             [project_name, "branch-"+username, files_update, username, notes, 0, '-', 0, 0, 1, '-'])
                 db.commit()
@@ -547,12 +544,14 @@ def project_details(name=None):
             dirs[i] = re.sub(UPLOAD_FOLDER,'',dirs[i])
         for i in range(len(files)):
             files[i] = re.sub(UPLOAD_FOLDER,'',files[i])
-        query = query_db('select * from members',[])
-        for q in query:
-            name_activity = query_db('select * from activity where project_name = ? and updated_by = ? order by updated_at desc',[project_name, q['username']], one=True)
-            if name_activity:
-                activities.append(name_activity)
-        return render_template('project_details.html', details=details, files=dirs+files, activities=sortActivity(activities), userlevel=userlevel)
+
+        activities = query_db('select * from activity where project_name = ? order by updated_at limit 20', [project_name])
+        #query = query_db('select * from members where username != ?',['mpociadmin'])
+        #for q in query:
+        #    name_activity = query_db('select * from activity where project_name = ? and updated_by = ? order by updated_at', [project_name, q['username']], one=True)
+        #    if name_activity:
+        #        activities.append(name_activity)
+        return render_template('project_details.html', details=details, files=dirs+files, activities=activities, userlevel=userlevel)
     else:
         return redirect(url_for('main_page'))
 
@@ -568,16 +567,17 @@ def view_project():
     view = request.args.get('view')
     project_name = request.args.get('project_name')
     activity_id = request.args.get('activity_id')
-    if view and project_name and activity_id and checkLogin():
+    if view and project_name and activity_id:
         try:
             activity_id = int(activity_id)
         except:
             return redirect(url_for('main_page'))
-        db = get_db()
-        db.text_factory = str
-        db.execute('update activity set review_status=1 where id=?',[activity_id])
-        db.commit()
-        db.close()
+        if checkLogin():
+            db = get_db()
+            db.text_factory = str
+            db.execute('update activity set review_status=1 where id=?',[activity_id])
+            db.commit()
+            db.close()
         return redirect("http://qqdewa.test/" + project_name + '/' + "branch-" + username)
     return redirect(url_for('main_page'))
     # EOL
@@ -715,6 +715,18 @@ def close_ticket():
 
     return redirect(url_for('main_page'))
 
+@app.route('/merge_history', methods=['GET','POST'])
+def merge_history():
+    if not len(session) and 'username' not in session.keys():
+        return redirect(url_for('main_page'))
+    error = None
+    mergeHistory = None
+    if request.method == 'GET':
+        mergeHistory = query_db('select * from activity where merge_status = 1 order by updated_at',[])
+        return render_template('merge_history.html', mergeHistory=mergeHistory)
+    return render_template('merge_history.html')
+
+"""
 @app.route('/revert_updates', methods=['GET','POST'])
 def revert_updates():
     if not len(session) and 'username' not in session.keys():
@@ -765,6 +777,7 @@ def revert_updates():
             return redirect(url_for('main_page'))
     else:
         return redirect(url_for('main_page'))
+"""
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(threaded=True)
