@@ -74,9 +74,15 @@ a.edit-link, a.edit-link:visited {
   color: #0067fa;
   background: #76b852;
 }
-a.delete-link, a.delete-link:visited {
+a.deactivate-link, a.deactivate-link:visited {
   display: block;
   color: #720a1e;
+  padding: 5px;
+  background: #76b852;
+}
+a.activate-link, a.activate-link:visited {
+  display: block;
+  color: #111;
   padding: 5px;
   background: #76b852;
 }

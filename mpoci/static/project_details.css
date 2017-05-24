@@ -21,23 +21,23 @@ label[for="title-form"] {
   padding: 0 0 5% 0;
 }
 label[for="project_name"] {
-  display: block-inline;
+  display: inline-block;
   font-size: 0.9em;
   color: #111;
 }
 span[name="disabled-project"] {
-  display: block-inline;
+  display: inline-block;
   font-size: 0.9em;
   color: #111;
   text-decoration: line-through;
 }
 label[for="project_created"] {
-  display: block-inline;
+  display: inline-block;
   font-size: 0.8em;
   color: #022866;
 }
 label[for="label_header"] {
-  display: block-inline;
+  display: inline-block;
   font-size: 0.9em;
   color: #111;
 }

@@ -5,7 +5,8 @@ create table members (
     username text not null,
     password text not null,
     level text not null,
-    time_date_added text not null
+    time_date_added text not null,
+    member_status integer not null
 );
 
 drop table if exists activity;

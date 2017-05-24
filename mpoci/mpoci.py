@@ -170,13 +170,14 @@ def main_page():
     fileList = None
     projectName = None
     activities = None
+    deactivatedMember = None
 
     if request.method == 'GET':
         if len(session):
             if 'username' in session.keys():
                 username = session['username']
                 projects = query_db('select * from projects order by project_name',[])
-                members = query_db('select * from members where username != ? order by level',['rootadmin'])
+                members = query_db('select * from members where username != ? and member_status = ? order by username',['rootadmin',1])
                 fileList = []
 
                 if 'project_name' in session.keys():
@@ -184,6 +185,8 @@ def main_page():
                     projectName = project_name
                 elif projects:
                     projectName = projects[0]['project_name']
+                else:
+                    return render_template('main_page.html', error=error, username=username, admin=admin, projects=projects, fileList=fileList, projectName=projectName, activities=activities)
 
                 dirs, files = dirTree(UPLOAD_FOLDER + '/' + projectName + '/master')
                 for i in range(len(files)):
@@ -233,12 +236,14 @@ def login():
     if request.method == 'POST':
         username = (request.form['username']).lower()
         password = request.form['password']
-        user = query_db("select username,password,level from members where username = ? and password = ?", [username,encryptPass(password)], one=True)
+        user = query_db("select username,password,level,member_status from members where username = ? and password = ?", [username,encryptPass(password)], one=True)
         if user == None:
             return render_template('login.html', error="Wrong username/password!")
-        else:
+        elif user['member_status'] == 1:
            session['username'] = username
            return redirect(url_for('main_page'))
+        else:
+           return render_template('login.html', error="Username has been deleted!")
     else:
         if len(session) and 'username' in session.keys():
             return redirect(url_for('main_page'))
@@ -271,9 +276,9 @@ def restore():
     else:
         db = get_db()
         db.text_factory = str
-        password = encryptPass('rahasia')
-        db.execute("insert into members (name, username, password, level, time_date_added) values (?, ?, ?, ?, datetime('now', 'localtime'))",
-                ['Super Admin', 'rootadmin', password, 'admin'])
+        password = encryptPass('password')
+        db.execute("insert into members (name, username, password, level, time_date_added, member_status) values (?, ?, ?, ?, datetime('now', 'localtime'), ?)",
+                ['Super Admin', 'rootadmin', password, 'admin', 1])
         db.commit()
         db.close()
         return "Restore Success!"
@@ -304,9 +309,22 @@ def new_member():
             if checkNewMember(username):
                 return render_template('new_member.html', error="* Username already exist!")
 
-            db.execute("insert into members (name, username, password, level, time_date_added) values (?, ?, ?, ?, datetime('now', 'localtime'))",
-                        [fullname, username, password, access_level])
+            db.execute("insert into members (name, username, password, level, time_date_added, member_status) values (?, ?, ?, ?, datetime('now', 'localtime'), ?)",
+                        [fullname, username, password, access_level, 1])
             db.commit()
+
+            projects = query_db('select * from projects',[])
+            if projects:
+                try:
+                    for project in projects:
+                        project_name = project['project_name']
+                        src = UPLOAD_FOLDER + '/' + project_name + '/master'
+                        dst = UPLOAD_FOLDER + '/' + project_name + '/branch-' + username
+                        shutil.copytree(src,dst)
+                        shutil.copystat(src,dst)
+                except:
+                    return "ERROR SHUTIL MODULE"
+
             return redirect(url_for('main_page'))
         else:
             return render_template('new_member.html', error="* Some fields are empty!")
@@ -334,10 +352,33 @@ def edit_member():
                 db.execute('update members set level = ? where username = ?', [new_level, edit_username])
                 db.commit()
                 message = "Update Success!"
-            elif edit_flag == '0' and session['username'] != edit_username:
-                db.execute('delete from members where username = ?', [edit_username])
+            elif edit_flag == '2' and session['username'] != edit_username:
+                db.execute('update members set member_status = ? where username = ?', [0, edit_username])
                 db.commit()
-                message = "Delete Success!"
+                projects = query_db('select * from projects',[])
+                if projects:
+                    try:
+                        for project in projects:
+                            project_name = project['project_name']
+                            dst = UPLOAD_FOLDER + '/' + project_name + '/branch-' + edit_username
+                            if os.path.isdir(dst):
+                                shutil.rmtree(dst)
+                    except:
+                        return "ERROR SHUTIL MODULE"
+            elif edit_flag == '3' and session['username'] != edit_username:
+                db.execute('update members set member_status = ? where username = ?', [1, edit_username])
+                db.commit()
+                projects = query_db('select * from projects',[])
+                if projects:
+                    try:
+                        for project in projects:
+                            project_name = project['project_name']
+                            src = UPLOAD_FOLDER + '/' + project_name + '/master'
+                            dst = UPLOAD_FOLDER + '/' + project_name + '/branch-' + edit_username
+                            shutil.copytree(src,dst)
+                            shutil.copystat(src,dst)
+                    except:
+                        return "ERROR SHUTIL MODULE"
             else:
                 return render_template('edit_member.html', members=query)
             db.close()
@@ -350,7 +391,7 @@ def edit_member():
 @app.route('/add_project', methods=['GET','POST'])
 def add_project():
     error = None
-    if not checkLogin():
+    if not len(session) and 'username' not in session.keys():
         return redirect(url_for('main_page'))
 
     if request.method == 'POST':
@@ -610,6 +651,7 @@ def delete_project():
                 db.execute('update projects set project_status = 1 where project_name = ?', [project_name])
                 db.commit()
             elif flag=='2':
+                session.pop('project_name', None)
                 db.execute('delete from projects where project_name = ?', [project_name])
                 db.commit()
                 db.execute('delete from activity where project_name = ?', [project_name])
