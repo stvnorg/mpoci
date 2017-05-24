@@ -26,7 +26,7 @@
     </tr>
     {% set number = [1] %}
     {% for member in members %}
-      {% if member.username != 'mpociadmin' %}
+      {% if member.username != 'rootadmin' %}
       <tr>
         <td>{{ number[0] }}</td>
         {% if number.append(number.pop()+1) %}{% endif %}

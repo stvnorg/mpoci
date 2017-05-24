@@ -27,7 +27,7 @@
     </tr>
     {% set number = [1] %}
     {% for history in mergeHistory %}
-      {% if history.updated_by != 'mpociadmin' %}
+      {% if history.updated_by != 'rootadmin' %}
       <tr>
         <td>{{ number[0] }}</td>
         {% if number.append(number.pop()+1) %}{% endif %}

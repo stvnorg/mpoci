@@ -176,7 +176,7 @@ def main_page():
             if 'username' in session.keys():
                 username = session['username']
                 projects = query_db('select * from projects order by project_name',[])
-                members = query_db('select * from members where username != ? order by level',['mpociadmin'])
+                members = query_db('select * from members where username != ? order by level',['rootadmin'])
                 fileList = []
 
                 if 'project_name' in session.keys():
@@ -210,7 +210,7 @@ def main_page():
                 project_name = request.form['dropdown_project']
                 session['project_name'] = project_name
                 projects = query_db('select * from projects order by project_name',[])
-                members = query_db('select * from members where username != ? order by level',['mpociadmin'])
+                members = query_db('select * from members where username != ? order by level',['rootadmin'])
                 fileList = []
                 dirs, files = dirTree(UPLOAD_FOLDER + '/' + project_name + '/master')
                 for i in range(len(files)):
@@ -262,10 +262,10 @@ def logout():
     else:
         return redirect(url_for('login'))
 
-# Create user 'mpociadmin' to restore portal access
+# Create user 'rootadmin' to restore portal access
 @app.route('/restore')
 def restore():
-    query = query_db("select username from members where username = ?", ['mpociAdmin'])
+    query = query_db("select username from members where username = ?", ['rootadmin'])
     if len(query):
         return "Nothing to restore"
     else:
@@ -273,7 +273,7 @@ def restore():
         db.text_factory = str
         password = encryptPass('rahasia')
         db.execute("insert into members (name, username, password, level, time_date_added) values (?, ?, ?, ?, datetime('now', 'localtime'))",
-                ['Super Admin', 'mpociadmin', password, 'admin'])
+                ['Super Admin', 'rootadmin', password, 'admin'])
         db.commit()
         db.close()
         return "Restore Success!"
@@ -387,7 +387,7 @@ def add_project():
             db.close()
             # EOL
 
-            members = query_db("select username from members where username not like ? ", ['mpociadmin'])
+            members = query_db("select username from members where username not like ? ", ['rootadmin'])
             # Start to uploading files
             for f in files:
                 fname = f.filename
@@ -555,7 +555,7 @@ def project_details(name=None):
             files[i] = re.sub(UPLOAD_FOLDER,'',files[i])
 
         activities = query_db('select * from activity where project_name = ? order by updated_at desc limit 20', [project_name])
-        #query = query_db('select * from members where username != ?',['mpociadmin'])
+        #query = query_db('select * from members where username != ?',['rootadmin'])
         #for q in query:
         #    name_activity = query_db('select * from activity where project_name = ? and updated_by = ? order by updated_at', [project_name, q['username']], one=True)
         #    if name_activity:
