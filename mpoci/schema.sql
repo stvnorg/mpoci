@@ -17,12 +17,16 @@ create table activity (
     updated_by text not null,
     updated_at text not null,
     notes text not null,
-    merge_status integer not null,
-    merge_notes text not null,
     revert_status integer not null,
     review_status integer not null,
-    activity_status integer not null,
-    activity_notes text not null
+    merge_status integer not null,
+    merge_by text not null,
+    merge_at text not null,
+    merge_notes text not null,
+    close_status integer not null,
+    close_by text not null,
+    close_at text not null,
+    close_notes text not null
 );
 
 drop table if exists merge_activity;

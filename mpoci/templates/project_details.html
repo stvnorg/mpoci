@@ -64,7 +64,7 @@
               <span class="new_label">New!</span>
             {% elif activity.merge_status==1 %}
               <span class="review_label">Merged</span>
-            {% elif activity.activity_status == 0 %}
+            {% elif activity.close_status == 1 %}
               <span class="review_label">Closed</span>
             {% elif activity.revert_status==1 %}
               <span class="review_label">Overwrited</span>

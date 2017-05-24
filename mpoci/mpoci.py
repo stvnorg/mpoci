@@ -195,7 +195,7 @@ def main_page():
                     for i in range(len(files)):
                         files[i] = re.sub(UPLOAD_FOLDER,'',files[i])
                     fileList.append([branch,files])
-                activities = query_db('select * from activity where project_name = ? and revert_status = 0 and merge_status != 2 order by updated_at desc limit 10', [projectName])
+                activities = query_db('select * from activity where project_name = ? and revert_status = 0 and merge_status != 2  and close_status = 0 order by updated_at desc limit 10', [projectName])
 
                 #return str(fileList)+str(len(fileList))
                 return render_template('main_page.html', error=error, username=username, admin=admin, projects=projects, fileList=fileList, projectName=projectName, activities=activities)
@@ -222,7 +222,7 @@ def main_page():
                     for i in range(len(files)):
                         files[i] = re.sub(UPLOAD_FOLDER,'',files[i])
                     fileList.append([branch,files])
-                activities = query_db('select * from activity where project_name = ? and revert_status = 0 and merge_status != 2 order by updated_at desc limit 10', [project_name])
+                activities = query_db('select * from activity where project_name = ? and revert_status = 0 and merge_status != 2 and close_status = 0 order by updated_at desc limit 10', [project_name])
                 return render_template('main_page.html', error=error, username=username, admin=admin, projects=projects, fileList=fileList, projectName=project_name, activities=activities)
     return render_template('main_page.html', error=error)
 
@@ -262,6 +262,7 @@ def logout():
     else:
         return redirect(url_for('login'))
 
+# Create user 'mpociadmin' to restore portal access
 @app.route('/restore')
 def restore():
     query = query_db("select username from members where username = ?", ['mpociAdmin'])
@@ -276,6 +277,7 @@ def restore():
         db.commit()
         db.close()
         return "Restore Success!"
+# EOL
 
 @app.route('/new_member', methods=['POST', 'GET'])
 def new_member():
@@ -513,8 +515,8 @@ def update_project():
                 db.text_factory = str
                 db.execute("update activity set revert_status = 1 where project_name = ? and updated_by = ?", [project_name, username])
                 db.commit()
-                db.execute("insert into activity (project_name, branch_name, files_list, updated_by, updated_at, notes, merge_status, merge_notes, revert_status, review_status, activity_status, activity_notes) values (?, ?, ?, ?, datetime('now','localtime'), ?, ?, ?, ?, ?, ?, ?)",
-                            [project_name, "branch-"+username, files_update, username, notes, 0, '-', 0, 0, 1, '-'])
+                db.execute("insert into activity (project_name, branch_name, files_list, updated_by, updated_at, notes, revert_status, review_status, merge_status, merge_by, merge_at, merge_notes, close_status, close_by, close_at, close_notes) values (?, ?, ?, ?, datetime('now','localtime'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                            [project_name, "branch-"+username, files_update, username, notes, 0, 0, 0, '-', '-', '-', 0, '-', '-', '-'])
                 db.commit()
                 db.close()
             # EOL
@@ -668,6 +670,7 @@ def merge():
         return redirect(url_for('main_page'))
     flag = None
     if request.method == 'POST':
+        username = session['username']
         notes = request.form['merge-notes']
         activity_id = request.form['act_id']
         try:
@@ -692,7 +695,7 @@ def merge():
             return "ERROR SHUTIL MODULE"
         db = get_db()
         db.text_factory = str
-        db.execute('update activity set review_status = ?, merge_status=?, merge_notes = ?, activity_status = ? where id = ?', [1, 1, notes, 0, activity_id])
+        db.execute("update activity set review_status = ?, merge_status=?, merge_by = ?, merge_at = datetime('now','localtime'), merge_notes = ? where id = ?", [1, 1, username, notes, activity_id])
         db.commit()
         db.close()
         return redirect("http://mpoci.portal/activity_details?act_id=" + str(activity_id))
@@ -705,6 +708,7 @@ def close_ticket():
         return redirect(url_for('main_page'))
     flag = None
     if request.method == 'POST':
+        username = session['username']
         notes = request.form['close-notes']
         activity_id = request.form['act_id']
         try:
@@ -715,7 +719,7 @@ def close_ticket():
             return redirect(url_for('main_page'))
         db = get_db()
         db.text_factory = str
-        db.execute('update activity set review_status = ?, activity_status=?, activity_notes = ? where id = ?', [1, 0, notes, activity_id])
+        db.execute("update activity set review_status = ?, close_status=?, close_by = ?, close_at = datetime('now','localtime'), close_notes = ? where id = ?", [1, 1, username, notes, activity_id])
         db.commit()
         db.close()
         return redirect("http://mpoci.portal/activity_details?act_id=" + str(activity_id))
