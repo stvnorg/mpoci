@@ -16,16 +16,6 @@ label[for="title-form"] {
   background: #ddd;
   text-decoration: underline;
 }
-.access-level {
-  width: 100%;
-  text-align: left;
-  padding: 0 0 5% 0;
-}
-label[for="access-level"] {
-  display: block-inline;
-  font-size: 0.8em;
-  color: #111;
-}
 .error {
   display: block;
   padding: 0 0 0.5% 0;
@@ -38,23 +28,11 @@ label[for="access-level"] {
   position: relative;
   z-index: 1;
   background: #eee;
-  max-width: 480px;
+  max-width: 600px;
   margin: 50px auto 100px;
   padding: 45px;
   text-align: center;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
-}
-a.edit-link, a.edit-link:visited {
-  display: block;
-  padding: 5px;
-  color: #0067fa;
-  background: #76b852;
-}
-a.delete-link, a.delete-link:visited {
-  display: block;
-  color: #720a1e;
-  padding: 5px;
-  background: #76b852;
 }
 .merge-list {
   border: 1px solid grey;
@@ -71,10 +49,13 @@ a.delete-link, a.delete-link:visited {
   border: 1px solid grey;
   border-collapse: collapse;
 }
-.details, .view {
+a.action_link, a.action_link:visited {
+  color: #111;
+}
+.details {
   display: block;
   padding: 5px 10px;
-  font-size: 0.75em;
+  font-size: 0.8em;
   color: #111;
   background: #76b852;
 }
