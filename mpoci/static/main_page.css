@@ -173,6 +173,12 @@ label[for="project_updated"] {
   color: #560030;
   font-weight: bold;
 }
+.username-deactivate {
+  font-size: 1em;
+  color: #560030;
+  font-weight: bold;
+  text-decoration: line-through;
+}
 .status {
   font-family: monospace;
   font-size: 1.1em;

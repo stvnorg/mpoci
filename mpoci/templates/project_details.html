@@ -32,7 +32,11 @@
         {% else %}
         <label for="project_name">Project Name: <strong><span name="disabled-project">{{ details.project_name.upper() }}</span></strong></label><br>
         {% endif %}
-      <label for="project_created">Created by <span class="username">{{ details.created_by }}</span>, at {{ details.created_at }}</label><br><br>
+      {% if details.created_by in deactivatedMember %}
+        <label for="project_created">Created by <span class="username-deactivate">{{ details.created_by }}</span>, at {{ details.created_at }}</label><br><br>
+      {% else %}
+        <label for="project_created">Created by <span class="username">{{ details.created_by }}</span>, at {{ details.created_at }}</label><br><br>
+      {% endif %}
       <label for="label_header">Description:</label><br>
       <label for="project_description">{{ details.description }}</label><br><br>
       <label for="label_header">Master Files:</label><br>
@@ -49,15 +53,28 @@
         {% for activity in activities %}
         <tr>
           <td>
+          {% if activity.updated_by in deactivatedMember %}
+            <label for="activities_list">Updated by: <span class="username-deactivate">{{ activity.updated_by }}</span>, at: {{ activity.updated_at }}&nbsp;&nbsp;</label>
+          {% else %}
             <label for="activities_list">Updated by: <span class="username">{{ activity.updated_by }}</span>, at: {{ activity.updated_at }}&nbsp;&nbsp;</label>
+          {% endif %}
           </td>
           {% if details.project_status == 1 %}
-            <td>
-              <a href="../activity_details?act_id={{ activity.id }}" target="_blank" class="details_link"><span class="details">Details</span></a>
-            </td>
-            <td>
-              <a href="../view_project?view=1&project_name={{ activity.project_name }}&activity_id={{ activity.id }}" class="view_link" target="_blank" onclick="setTimeout(location.reload.bind(location), 5000);"><span class="view">View</span></a>
-            </td>
+           {% if activity.updated_by in deactivatedMember %}
+              <td>
+                <span class="details">---</span>
+              </td>
+              <td>
+                <span class="view">---</span>
+              </td>
+           {% else %}
+              <td>
+                <a href="../activity_details?act_id={{ activity.id }}" target="_blank" class="details_link"><span class="details">Details</span></a>
+              </td>
+              <td>
+                <a href="../view_project?view=1&project_name={{ activity.project_name }}&activity_id={{ activity.id }}" class="view_link" target="_blank" onclick="setTimeout(location.reload.bind(location), 5000);"><span class="view">View</span></a>
+              </td>
+            {% endif %}
           {% endif %}
           <td>
             {% if activity.merge_status==0 and activity.revert_status==0 and activity.review_status==0 %}

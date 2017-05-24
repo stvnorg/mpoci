@@ -178,6 +178,9 @@ def main_page():
                 username = session['username']
                 projects = query_db('select * from projects order by project_name',[])
                 members = query_db('select * from members where username != ? and member_status = ? order by username',['rootadmin',1])
+                dmember_query = query_db('select * from members where member_status = ?',[0])
+                if dmember_query:
+                    deactivatedMember = [d['username'] for d in dmember_query]
                 fileList = []
 
                 if 'project_name' in session.keys():
@@ -186,7 +189,7 @@ def main_page():
                 elif projects:
                     projectName = projects[0]['project_name']
                 else:
-                    return render_template('main_page.html', error=error, username=username, admin=admin, projects=projects, fileList=fileList, projectName=projectName, activities=activities)
+                    return render_template('main_page.html', error=error, username=username, admin=admin, projects=projects, fileList=fileList, projectName=projectName, activities=activities, deactivatedMember=deactivatedMember)
 
                 dirs, files = dirTree(UPLOAD_FOLDER + '/' + projectName + '/master')
                 for i in range(len(files)):
@@ -201,7 +204,7 @@ def main_page():
                 activities = query_db('select * from activity where project_name = ? and revert_status = 0 and merge_status != 2  and close_status = 0 order by updated_at desc limit 10', [projectName])
 
                 #return str(fileList)+str(len(fileList))
-                return render_template('main_page.html', error=error, username=username, admin=admin, projects=projects, fileList=fileList, projectName=projectName, activities=activities)
+                return render_template('main_page.html', error=error, username=username, admin=admin, projects=projects, fileList=fileList, projectName=projectName, activities=activities, deactivatedMember=deactivatedMember)
             else:
                 return redirect(url_for('login'))
         else:
@@ -213,7 +216,10 @@ def main_page():
                 project_name = request.form['dropdown_project']
                 session['project_name'] = project_name
                 projects = query_db('select * from projects order by project_name',[])
-                members = query_db('select * from members where username != ? order by level',['rootadmin'])
+                members = query_db('select * from members where username != ? and member_status = ? order by level',['rootadmin', 1])
+                dmember_query = query_db('select * from members where member_status = ?',[0])
+                if dmember_query:
+                    deactivatedMember = [d['username'] for d in dmember_query]
                 fileList = []
                 dirs, files = dirTree(UPLOAD_FOLDER + '/' + project_name + '/master')
                 for i in range(len(files)):
@@ -226,7 +232,7 @@ def main_page():
                         files[i] = re.sub(UPLOAD_FOLDER,'',files[i])
                     fileList.append([branch,files])
                 activities = query_db('select * from activity where project_name = ? and revert_status = 0 and merge_status != 2 and close_status = 0 order by updated_at desc limit 10', [project_name])
-                return render_template('main_page.html', error=error, username=username, admin=admin, projects=projects, fileList=fileList, projectName=project_name, activities=activities)
+                return render_template('main_page.html', error=error, username=username, admin=admin, projects=projects, fileList=fileList, projectName=project_name, activities=activities, deactivatedMember=deactivatedMember)
     return render_template('main_page.html', error=error)
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -576,6 +582,7 @@ def project_details(name=None):
     activities = []
     username = session['username']
     userlevel = 1 if checkLogin() else None
+    deactivatedMember = None
 
     if request.method == 'GET':
         if name:
@@ -601,7 +608,12 @@ def project_details(name=None):
         #    name_activity = query_db('select * from activity where project_name = ? and updated_by = ? order by updated_at', [project_name, q['username']], one=True)
         #    if name_activity:
         #        activities.append(name_activity)
-        return render_template('project_details.html', details=details, files=dirs+files, activities=activities, userlevel=userlevel)
+
+        dmember_query = query_db('select * from members where member_status = ?',[0])
+        if dmember_query:
+            deactivatedMember = [d['username'] for d in dmember_query]
+
+        return render_template('project_details.html', details=details, files=dirs+files, activities=activities, userlevel=userlevel, deactivatedMember=deactivatedMember)
     else:
         return redirect(url_for('main_page'))
 
@@ -693,6 +705,10 @@ def activity_details():
 
         details = query_db('select * from activity where id = ?', [activity_id], one=True)
         if not details:
+            return redirect(url_for('main_page'))
+
+        query = query_db('select * from members where username = ? and member_status = ?', [details['updated_by'], 0])
+        if query:
             return redirect(url_for('main_page'))
 
         dirs, files = dirTree(UPLOAD_FOLDER + '/' + details['project_name'] + '/branch-' + details['updated_by'])

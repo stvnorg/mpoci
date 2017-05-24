@@ -63,6 +63,11 @@ label[for="activities_list"] {
   font-size: 1em;
   color: #560030;
 }
+.username-deactivate {
+  font-size: 1em;
+  color: #560030;
+  text-decoration: line-through;
+}
 .error {
   display: block;
   padding: 0 0 0.5% 0;

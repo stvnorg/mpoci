@@ -77,7 +77,11 @@
     {% if activities %}
       {% for act in activities %}
         <div class="activity_div">
-          <label for="project_updated">Updated by <span class="username">{{ act.updated_by }}</span>, at {{ act.updated_at }}</label><br>
+          {% if act.updated_by in deactivatedMember %}
+            <label for="project_updated">Updated by <span class="username-deactivate">{{ act.updated_by }}</span>, at {{ act.updated_at }}</label><br>
+          {% else %}
+            <label for="project_updated">Updated by <span class="username">{{ act.updated_by }}</span>, at {{ act.updated_at }}</label><br>
+          {% endif %}
           <label for="project_updated">Status:
            {% if act.merge_status == 1 %}
             <span class="status">MERGED!</span><br>
@@ -86,8 +90,10 @@
            {% else %}
             <span class="new-status">NEW!</span><br>
            {% endif %}
-           <a href="../view_project?view=1&project_name={{ act.project_name }}&activity_id={{ act.id }}" class="action_link" target="_blank"><span class="view">View</span></a>&nbsp;&nbsp;
-           <a href="../activity_details?act_id={{ act.id }}" target="_blank" class="action_link"><span class="details">Details</span></a>
+           {% if act.updated_by not in deactivatedMember %}
+              <a href="../view_project?view=1&project_name={{ act.project_name }}&activity_id={{ act.id }}" class="action_link" target="_blank"><span class="view">View</span></a>&nbsp;&nbsp;
+              <a href="../activity_details?act_id={{ act.id }}" target="_blank" class="action_link"><span class="details">Details</span></a>
+           {% endif %}
          </label>
         </div>
       {% endfor %}
