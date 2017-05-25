@@ -556,7 +556,7 @@ def update_project():
                     files_removed.append(f)
             # EOL
 
-            files_update = ';'.join(files_update_list) + '-' + ';'.join(files_removed)
+            files_update = ';'.join(files_update_list) + '|' + ';'.join(files_removed)
             # Update 'activity' table
             if files_update_list or files_removed:
                 db = get_db()
@@ -697,6 +697,9 @@ def activity_details():
     #reverted_activity = None
     username = session['username']
     userlevel = 1 if checkLogin() else None
+    filesUpdated = []
+    filesRemoved = []
+
     if request.method == 'GET':
         activity_id = request.args.get('act_id')
         try:
@@ -707,6 +710,12 @@ def activity_details():
         details = query_db('select * from activity where id = ?', [activity_id], one=True)
         if not details:
             return redirect(url_for('main_page'))
+
+        # Get the list of all updated and removed files on this activity
+        filelist = details['files_list'].split('|')
+        filesUpdated = [i for i in filelist[0].split(';')]
+        filesRemoved = [re.sub(UPLOAD_FOLDER,'',i) for i in filelist[1].split(';')]
+        # EOL
 
         query = query_db('select * from members where username = ? and member_status = ?', [details['updated_by'], 0])
         if query:
@@ -719,7 +728,7 @@ def activity_details():
             files[i] = re.sub(UPLOAD_FOLDER,'',files[i])
         project_status = query_db('select project_status from projects where project_name = ?', [details['project_name']], one=True)
         #reverted_activity = query_db('select * from revert_activity where activity_id = ?', [activity_id], one=True)
-        return render_template('activity_details.html', details=details, project_status=project_status, files=dirs+files, userlevel=userlevel, testIP=MPOTECH_TESTSERVER_IP)
+        return render_template('activity_details.html', details=details, project_status=project_status, files=dirs+files, filesUpdated=filesUpdated, filesRemoved=filesRemoved, userlevel=userlevel, testIP=MPOTECH_TESTSERVER_IP)
     else:
         return redirect(url_for('main_page'))
 

@@ -98,13 +98,30 @@
         <label for="label_header">Reply:</label><br>
         <label for="update_notes">{{ details.close_notes }}</label><br><br>
       {% endif %}
-      <label for="label_header">Files in branch-{{ details.updated_by }}:</label><br>
+      <label for="label_header">Files Updated/Added:</label><br>
+      {% if filesUpdated %}
+        {% for file in filesUpdated %}
+          <label for="files_structure">{{ file }}</label><br>
+        {% endfor %}
+        {% else %}
+          <label for="files_structure">--</label><br>
+      {% endif %} <br>
+      <label for="label_header">Files Removed:</label><br>
+      {% if filesRemoved %}
+        {% for file in filesRemoved %}
+          <label for="files_structure">{{ file }}</label><br>
+        {% endfor %}
+        {% else %}
+          <label for="files_structure">--</label><br>
+      {% endif %} <br>
+
+      <!-- <label for="label_header">Files in branch-{{ details.updated_by }}:</label><br>
         {% if files %}
          {% for file in files %}
           <label for="files_structure">{{ file }}</label><br>
           {% endfor %}
         {% endif %}
-      {% endif %}
+      {% endif %} -->
       <br>
       </div>
       <div class="action_div">
