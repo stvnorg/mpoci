@@ -99,7 +99,7 @@
         <label for="update_notes">{{ details.close_notes }}</label><br><br>
       {% endif %}
       <label for="label_header">Files Updated/Added:</label><br>
-      {% if filesUpdated %}
+      {% if filesUpdated[0] != '' %}
         {% for file in filesUpdated %}
           <label for="files_structure-updated">{{ file }}</label><br>
         {% endfor %}
@@ -107,7 +107,7 @@
           <label for="files_structure-updated">--</label><br>
       {% endif %} <br>
       <label for="label_header">Files Removed:</label><br>
-      {% if filesRemoved %}
+      {% if filesRemoved[0] != '' %}
         {% for file in filesRemoved %}
           <label for="files_structure-removed">{{ file }}</label><br>
         {% endfor %}

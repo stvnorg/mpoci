@@ -697,8 +697,8 @@ def activity_details():
     #reverted_activity = None
     username = session['username']
     userlevel = 1 if checkLogin() else None
-    filesUpdated = []
-    filesRemoved = []
+    filesUpdated = None
+    filesRemoved = None
 
     if request.method == 'GET':
         activity_id = request.args.get('act_id')
