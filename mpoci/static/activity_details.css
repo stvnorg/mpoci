@@ -48,11 +48,17 @@ label[for="update_notes"] {
   font-style: italic;
   color: #333;
 }
-label[for="files_structure"] {
+label[for="files_structure-updated"] {
   display: inline-block;
   font-size: 0.75em;
   padding-left: 10px;
   color: #0067fa;
+}
+label[for="files_structure-removed"] {
+  display: inline-block;
+  font-size: 0.75em;
+  padding-left: 10px;
+  color: red;
 }
 label[for="activities_list"] {
   display: inline-block;

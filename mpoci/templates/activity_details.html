@@ -101,18 +101,18 @@
       <label for="label_header">Files Updated/Added:</label><br>
       {% if filesUpdated %}
         {% for file in filesUpdated %}
-          <label for="files_structure">{{ file }}</label><br>
+          <label for="files_structure-updated">{{ file }}</label><br>
         {% endfor %}
         {% else %}
-          <label for="files_structure">--</label><br>
+          <label for="files_structure-updated">--</label><br>
       {% endif %} <br>
       <label for="label_header">Files Removed:</label><br>
       {% if filesRemoved %}
         {% for file in filesRemoved %}
-          <label for="files_structure">{{ file }}</label><br>
+          <label for="files_structure-removed">{{ file }}</label><br>
         {% endfor %}
         {% else %}
-          <label for="files_structure">--</label><br>
+          <label for="files_structure-removed">--</label><br>
       {% endif %} <br>
 
       <!-- <label for="label_header">Files in branch-{{ details.updated_by }}:</label><br>
