@@ -49,7 +49,7 @@
     <div class="files-list-div">
       {% if fileList %}
         {% for file in fileList %}
-          --&nbsp;<label for="list-name"><a href='http://qqdewa.test/{{ projectName }}/{{ file[0] }}' class="project-link" target="_blank">{{ file[0] }}</a></label><br>
+          --&nbsp;<label for="list-name"><a href='http://{{ testIP }}/{{ projectName }}/{{ file[0] }}' class="project-link" target="_blank">{{ file[0] }}</a></label><br>
           {% for i in range(5) %}
             {% if file[1][i] %}
               <label for="files">{{ file[1][i] }}</label><br>

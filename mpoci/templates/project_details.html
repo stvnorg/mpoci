@@ -28,7 +28,7 @@
       <div class="access-level">
       {% if details %}
         {% if details.project_status %}
-        <label for="project_name">Project Name: <a href="http://qqdewa.test/{{ details.project_name }}/master" target="_blank"><strong>{{ details.project_name.upper() }}</strong></a> -- <a href="../update_project" class="upload-link"/>&nbsp;&lt;Upload&gt;</a></label><br>
+        <label for="project_name">Project Name: <a href="http://{{ testIP }}/{{ details.project_name }}/master" target="_blank"><strong>{{ details.project_name.upper() }}</strong></a> -- <a href="../update_project" class="upload-link"/>&nbsp;&lt;Upload&gt;</a></label><br>
         {% else %}
         <label for="project_name">Project Name: <strong><span name="disabled-project">{{ details.project_name.upper() }}</span></strong></label><br>
         {% endif %}

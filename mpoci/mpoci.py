@@ -9,6 +9,7 @@ from Crypto.Cipher import AES
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 from werkzeug.utils import secure_filename
 
+MPOTECH_TESTSERVER_IP = '10.0.2.15'
 UPLOAD_FOLDER = '/var/www/qqdewa.test/html'
 
 app = Flask(__name__)   # create the application instance :)
@@ -170,7 +171,7 @@ def main_page():
     fileList = None
     projectName = None
     activities = None
-    deactivatedMember = None
+    deactivatedMember = []
 
     if request.method == 'GET':
         if len(session):
@@ -189,7 +190,7 @@ def main_page():
                 elif projects:
                     projectName = projects[0]['project_name']
                 else:
-                    return render_template('main_page.html', error=error, username=username, admin=admin, projects=projects, fileList=fileList, projectName=projectName, activities=activities, deactivatedMember=deactivatedMember)
+                    return render_template('main_page.html', error=error, username=username, admin=admin, projects=projects, fileList=fileList, projectName=projectName, activities=activities, deactivatedMember=deactivatedMember, testIP=MPOTECH_TESTSERVER_IP)
 
                 dirs, files = dirTree(UPLOAD_FOLDER + '/' + projectName + '/master')
                 for i in range(len(files)):
@@ -204,7 +205,7 @@ def main_page():
                 activities = query_db('select * from activity where project_name = ? and revert_status = 0 and merge_status != 2  and close_status = 0 order by updated_at desc limit 10', [projectName])
 
                 #return str(fileList)+str(len(fileList))
-                return render_template('main_page.html', error=error, username=username, admin=admin, projects=projects, fileList=fileList, projectName=projectName, activities=activities, deactivatedMember=deactivatedMember)
+                return render_template('main_page.html', error=error, username=username, admin=admin, projects=projects, fileList=fileList, projectName=projectName, activities=activities, deactivatedMember=deactivatedMember, testIP=MPOTECH_TESTSERVER_IP)
             else:
                 return redirect(url_for('login'))
         else:
@@ -232,7 +233,7 @@ def main_page():
                         files[i] = re.sub(UPLOAD_FOLDER,'',files[i])
                     fileList.append([branch,files])
                 activities = query_db('select * from activity where project_name = ? and revert_status = 0 and merge_status != 2 and close_status = 0 order by updated_at desc limit 10', [project_name])
-                return render_template('main_page.html', error=error, username=username, admin=admin, projects=projects, fileList=fileList, projectName=project_name, activities=activities, deactivatedMember=deactivatedMember)
+                return render_template('main_page.html', error=error, username=username, admin=admin, projects=projects, fileList=fileList, projectName=project_name, activities=activities, deactivatedMember=deactivatedMember, testIP=MPOTECH_TESTSERVER_IP)
     return render_template('main_page.html', error=error)
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -582,7 +583,7 @@ def project_details(name=None):
     activities = []
     username = session['username']
     userlevel = 1 if checkLogin() else None
-    deactivatedMember = None
+    deactivatedMember = []
 
     if request.method == 'GET':
         if name:
@@ -613,7 +614,7 @@ def project_details(name=None):
         if dmember_query:
             deactivatedMember = [d['username'] for d in dmember_query]
 
-        return render_template('project_details.html', details=details, files=dirs+files, activities=activities, userlevel=userlevel, deactivatedMember=deactivatedMember)
+        return render_template('project_details.html', details=details, files=dirs+files, activities=activities, userlevel=userlevel, deactivatedMember=deactivatedMember, testIP=MPOTECH_TESTSERVER_IP)
     else:
         return redirect(url_for('main_page'))
 
@@ -640,7 +641,7 @@ def view_project():
             db.execute('update activity set review_status=1 where id=?',[activity_id])
             db.commit()
             db.close()
-        return redirect("http://qqdewa.test/" + project_name + '/' + "branch-" + username)
+        return redirect("http://" + MPOTECH_TESTSERVER_IP + '/' + project_name + '/' + "branch-" + username)
     return redirect(url_for('main_page'))
     # EOL
 
@@ -678,7 +679,7 @@ def delete_project():
                 except:
                     return redirect(url_for('main_page'))
                 return redirect(url_for('main_page'))
-            return redirect('http://mpoci.portal/project_details?name=' + project_name)
+            return redirect('http://' + MPOTECH_TESTSERVER_IP + ':5000/project_details?name=' + project_name)
         except:
             return redirect(url_for('main_page'))
         db.close()
@@ -718,7 +719,7 @@ def activity_details():
             files[i] = re.sub(UPLOAD_FOLDER,'',files[i])
         project_status = query_db('select project_status from projects where project_name = ?', [details['project_name']], one=True)
         #reverted_activity = query_db('select * from revert_activity where activity_id = ?', [activity_id], one=True)
-        return render_template('activity_details.html', details=details, project_status=project_status, files=dirs+files, userlevel=userlevel)
+        return render_template('activity_details.html', details=details, project_status=project_status, files=dirs+files, userlevel=userlevel, testIP=MPOTECH_TESTSERVER_IP)
     else:
         return redirect(url_for('main_page'))
 
@@ -756,7 +757,7 @@ def merge():
         db.execute("update activity set review_status = ?, merge_status=?, merge_by = ?, merge_at = datetime('now','localtime'), merge_notes = ? where id = ?", [1, 1, username, notes, activity_id])
         db.commit()
         db.close()
-        return redirect("http://mpoci.portal/activity_details?act_id=" + str(activity_id))
+        return redirect("http://" + MPOTECH_TESTSERVER_IP + ":5000/activity_details?act_id=" + str(activity_id))
 
     return redirect(url_for('main_page'))
 
@@ -780,7 +781,7 @@ def close_ticket():
         db.execute("update activity set review_status = ?, close_status=?, close_by = ?, close_at = datetime('now','localtime'), close_notes = ? where id = ?", [1, 1, username, notes, activity_id])
         db.commit()
         db.close()
-        return redirect("http://mpoci.portal/activity_details?act_id=" + str(activity_id))
+        return redirect("http://" + MPOTECH_TESTSERVER_IP + ":5000/activity_details?act_id=" + str(activity_id))
 
     return redirect(url_for('main_page'))
 
