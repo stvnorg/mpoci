@@ -407,13 +407,13 @@ def add_project():
         project_name = project_name.lower()
         description = request.form['description']
 
-        if len(request.files.getlist('files[]')) == 1 and ( not project_name or not description ):
+        if request.files['files'] and ( not project_name or not description ):
             return render_template('add_project.html', error="* Some fields are empty!")
-        elif len(request.files.getlist('files[]')) > 1 and ( not project_name or not description ):
+        elif request.files['files'] and ( not project_name or not description ):
             return render_template('add_project.html', error="* Some fields are empty!")
-        elif len(request.files.getlist('files[]')) == 1 and ( project_name or description ):
-            return render_template('add_project.html', error="* No folder selected!")
-        elif len(request.files.getlist('files[]')) > 1 and project_name and description:
+        elif not request.files['files'] and ( project_name or description ):
+            return render_template('add_project.html', error="* No file selected!")
+        elif request.files['files'] and project_name and description:
             if not projectNameValidation(project_name):
                 return render_template('add_project.html', error="* Invalid Project Name!")
 
@@ -423,7 +423,11 @@ def add_project():
                 return render_template('add_project.html', error="* Duplicate Project Name!")
             # End of check duplicate lines
 
-            files = request.files.getlist('files[]', None)
+            files = request.files['files']
+            filename = secure_filename(files.filename)
+            files.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+            return redirect("http://" + MPOTECH_TESTSERVER_IP +  ":5000")
 
             # Insert details of projects in the database
             db = get_db()
@@ -443,7 +447,7 @@ def add_project():
                 fname = [str(i) for i in fname]
                 if len(fname) == 1:
                     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER + '/' + project_name + '/' + member.username + '/'
-                    f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(fname[0])))
+                    f.save(os.path.join(app.config['UPLOAD_FOLDER'], fname[0]))
                 else:
                     fTree = [fname[0]] + ["master"] + fname[1:]
                     fTree[0] = project_name
@@ -452,6 +456,7 @@ def add_project():
                         directoryTree += '/' + directory
                         if not os.path.isdir(directoryTree):
                             os.mkdir(directoryTree)
+
                     app.config['UPLOAD_FOLDER'] = directoryTree
                     f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(fTree[len(fTree)-1])))
             # EOL
@@ -815,13 +820,15 @@ def download():
         if project_name and section:
             try:
                 downloadPath = UPLOAD_FOLDER + '/' + project_name + '/' + section + '/*'
-                downloadURL = UPLOAD_FOLDER + '/' + project_name + '/' + section 
+                downloadURL = UPLOAD_FOLDER + '/' + project_name + '/' + section
                 command = 'zip ' + downloadURL + ' ' + downloadPath
-                os.system(command)
+                dirpath = UPLOAD_FOLDER + '/' + project_name
+                os.chdir(dirpath)
+                os.system('zip ' + project_name + '-' + section + ' ' + section + '/*')
                 return redirect('http://' + MPOTECH_TESTSERVER_IP + '/' + project_name + '/' + section + '.zip')
             except Exception as e:
                 return e
-                return "Download Error!"
+                #return "Download Error!"
     else:
         return redirect(url_for('main_page'))
     return redirect('http://' + MPOTECH_TESTSERVER_IP + '/4dmaster/master.zip')

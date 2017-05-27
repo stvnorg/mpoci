@@ -23,9 +23,9 @@
       <label for="add-project">Project Name : </label>
       <input type="text" placeholder="" name="project_name" value="{{ request.form.project_name }}" /><br>
       <label for="add-project">Project Folder : </label>
-      <input type="file" name="files[]" webkitdirectory mozdirectory odirectory msdirectory multiple="multiple"><br>
+      <!-- <input type="file" name="files[]" webkitdirectory mozdirectory odirectory msdirectory multiple="multiple"><br> -->
       <!-- <input type="file" name="files[]" onchange="selectFolder(event)"; webkitdirectory mozdirectory odirectory msdirectory multiple="multiple"><br> -->
-      <!-- <input type="file" name="files[]"><br> -->
+      <input type="file" name="files"><br>
       <label for="add-project">Description:</label><br>
       <textarea rows="4" cols="50" name="description"></textarea><br><br>
       <button>Submit</button>
