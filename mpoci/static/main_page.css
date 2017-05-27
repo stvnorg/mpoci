@@ -93,6 +93,14 @@ form[name='main-form'] {
   background: #ddd;
   text-decoration: none;
 }
+.download-link {
+  display: inline-block;
+  padding: 5px 5px 3px 5px;
+  font-size: 0.7em;
+  color: #4f0408;
+  background: #ddd;
+  text-decoration: none;
+}
 .files-list-div {
   margin: 10px 0 0 10px;
 }

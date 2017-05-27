@@ -19,3 +19,5 @@ exec gunicorn hello:app -b 0.0.0.0:8080 \
   --workers $NUM_WORKERS \
   --user=$USER --group=$GROUP \
   --bind=unix:$SOCKFILE
+
+    Contact GitHub API Training Shop Blog About

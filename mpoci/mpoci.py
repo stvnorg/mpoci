@@ -805,6 +805,27 @@ def merge_history():
         return render_template('merge_history.html', mergeHistory=mergeHistory)
     return render_template('merge_history.html')
 
+@app.route('/download', methods=['GET','POST'])
+def download():
+    if not len(session) and 'username' not in session.keys():
+        return redirect(url_for('main_page'))
+    if request.method == 'GET':
+        project_name = request.args.get('project_name')
+        section = request.args.get('section')
+        if project_name and section:
+            try:
+                downloadPath = UPLOAD_FOLDER + '/' + project_name + '/' + section + '/*'
+                downloadURL = UPLOAD_FOLDER + '/' + project_name + '/' + section 
+                command = 'zip ' + downloadURL + ' ' + downloadPath
+                os.system(command)
+                return redirect('http://' + MPOTECH_TESTSERVER_IP + '/' + project_name + '/' + section + '.zip')
+            except Exception as e:
+                return e
+                return "Download Error!"
+    else:
+        return redirect(url_for('main_page'))
+    return redirect('http://' + MPOTECH_TESTSERVER_IP + '/4dmaster/master.zip')
+
 """
 @app.route('/revert_updates', methods=['GET','POST'])
 def revert_updates():
