@@ -426,8 +426,34 @@ def add_project():
             files = request.files['files']
             filename = secure_filename(files.filename)
             files.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            zipname = files.filename.split('.')[0]
 
-            return redirect("http://" + MPOTECH_TESTSERVER_IP +  ":5000")
+            directory = UPLOAD_FOLDER + '/' + project_name
+
+            try:
+                # Extract the zip file and rename is as 'master' then delete the zipfile
+                if not os.path.isdir(directory):
+                    os.mkdir(directory)
+                os.chdir(UPLOAD_FOLDER)
+                command = "unzip " + filename + " -d " + directory + "/"
+                os.system(command)
+                command = "mv " + directory + "/" + zipname + " " + directory + "/master"
+                os.system(command)
+                command = "rm -rf " + UPLOAD_FOLDER + "/" + filename
+                os.system(command)
+                # EOL
+
+                members = query_db("select username from members where username not like ? ", ['rootadmin'])
+                # Generate Branch Folders Project
+                src = directory + '/master'
+                for member in members:
+                    dst = UPLOAD_FOLDER + '/' + project_name + '/branch-' + member['username']
+                    shutil.copytree(src,dst)
+                    shutil.copystat(src,dst)
+                # EOL
+
+            except:
+                return 'ERROR'
 
             # Insert details of projects in the database
             db = get_db()
@@ -439,6 +465,9 @@ def add_project():
             db.close()
             # EOL
 
+            return redirect("http://" + MPOTECH_TESTSERVER_IP +  ":5000")
+
+            """
             members = query_db("select username from members where username not like ? ", ['rootadmin'])
             # Start to uploading files
             for f in files:
@@ -469,7 +498,7 @@ def add_project():
                 shutil.copystat(src,dst)
             # EOL
             return redirect(url_for('main_page'))
-
+            """
     return render_template('add_project.html', error=error)
 
 @app.route('/update_project', methods=['GET', 'POST'])
@@ -511,12 +540,13 @@ def update_project():
             except:
                 return "ERROR python 'shutil' module"
 
+            if os.path.isdir(src):
+                shutil.rmtree(src)
+
+            """
             files = request.files.getlist('files[]', None)
             updates_list = []
             files_update_list = []
-
-            if os.path.isdir(src):
-                shutil.rmtree(src)
 
             for f in files:
                 fname = f.filename
@@ -550,7 +580,8 @@ def update_project():
                     files_update_list.append(new_file)
                 files_update_list.sort()
                 # EOL
-
+            """
+            
             # Check files or folder that are deleted in the new updates
             files_removed = []
             _, old_files = dirTree(dst)
