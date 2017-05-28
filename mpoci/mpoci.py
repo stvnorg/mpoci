@@ -395,6 +395,34 @@ def edit_member():
     else:
         return render_template('edit_member.html', members=query)
 
+def add_project_process(project_name,filename,zipname,directory):
+    try:
+        # Extract the zip file and rename is as 'master' then delete the zipfile
+        if not os.path.isdir(directory):
+            os.mkdir(directory)
+        os.chdir(UPLOAD_FOLDER)
+        command = "unzip " + filename + " -d " + directory + "/"
+        os.system(command)
+        command = "mv " + directory + "/" + zipname + " " + directory + "/master"
+        os.system(command)
+        command = "rm -rf " + UPLOAD_FOLDER + "/" + filename
+        os.system(command)
+        # EOL
+
+        members = query_db("select username from members where username not like ? ", ['rootadmin'])
+        # Generate Branch Folders Project
+        src = directory + '/master'
+        for member in members:
+            dst = UPLOAD_FOLDER + '/' + project_name + '/branch-' + member['username']
+            shutil.copytree(src,dst)
+            shutil.copystat(src,dst)
+        # EOL
+
+    except:
+        return "TIMEOUT"
+
+    return redirect("http://" + MPOTECH_TESTSERVER_IP +  ":5000")
+
 @app.route('/add_project', methods=['GET','POST'])
 def add_project():
     error = None
@@ -430,6 +458,18 @@ def add_project():
 
             directory = UPLOAD_FOLDER + '/' + project_name
 
+            # Insert details of projects in the database
+            db = get_db()
+            db.text_factory = str
+            created_by = session['username']
+            db.execute("insert into projects (project_name, description, created_by, created_at, project_status) values (?, ?, ?, datetime('now', 'localtime'), ?)",
+                        [project_name, description, created_by, 1])
+            db.commit()
+            db.close()
+            # EOL
+            
+            return add_project_process(project_name, filename, zipname, directory)
+
             try:
                 # Extract the zip file and rename is as 'master' then delete the zipfile
                 if not os.path.isdir(directory):
@@ -453,7 +493,7 @@ def add_project():
                 # EOL
 
             except:
-                return 'ERROR'
+                return redirect("http://" + MPOTECH_TESTSERVER_IP +  ":5000")
 
             # Insert details of projects in the database
             db = get_db()
@@ -581,7 +621,7 @@ def update_project():
                 files_update_list.sort()
                 # EOL
             """
-            
+
             # Check files or folder that are deleted in the new updates
             files_removed = []
             _, old_files = dirTree(dst)
