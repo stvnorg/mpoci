@@ -1,10 +1,5 @@
 @import url(https://fonts.googleapis.com/css?family=Roboto:300);
 
-.edit-member {
-  width: 360px;
-  padding: 8% 0 0;
-  margin: auto;
-}
 label[for="title-form"] {
   display: block;
   padding: 3% 0 3% 0;
@@ -80,7 +75,7 @@ label[for="activities_list"] {
   position: relative;
   z-index: 1;
   background: #eee;
-  max-width: 480px;
+  max-width: 800px;
   margin: 50px auto 100px;
   padding: 45px;
   text-align: center;

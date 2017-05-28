@@ -138,7 +138,7 @@ def sortActivity(activity):
             i += 1
     return A
 
-def dirTree(dir_path):
+def dirTree(dir_path, length=None):
 
     DIRECTORY = [dir_path+'/']
     files_list = []
@@ -148,8 +148,15 @@ def dirTree(dir_path):
     while dir:
         for i in range(len(DIRECTORY)):
             result = os.listdir(DIRECTORY[i])
-            for r in result:
-                tmp = DIRECTORY[i] + r + '/'
+            n = 0
+            if len(result) <= 10:
+                n = len(result)
+            elif len(result) > 10 and length == None:
+                n = 10
+            else:
+                n = len(result)
+            for r in range(n):
+                tmp = DIRECTORY[i] + result[r] + '/'
                 if os.path.isdir(tmp):
                     if tmp not in DIRECTORY:
                         DIRECTORY.append(tmp)
@@ -395,34 +402,6 @@ def edit_member():
     else:
         return render_template('edit_member.html', members=query)
 
-def add_project_process(project_name,filename,zipname,directory):
-    try:
-        # Extract the zip file and rename is as 'master' then delete the zipfile
-        if not os.path.isdir(directory):
-            os.mkdir(directory)
-        os.chdir(UPLOAD_FOLDER)
-        command = "unzip " + filename + " -d " + directory + "/"
-        os.system(command)
-        command = "mv " + directory + "/" + zipname + " " + directory + "/master"
-        os.system(command)
-        command = "rm -rf " + UPLOAD_FOLDER + "/" + filename
-        os.system(command)
-        # EOL
-
-        members = query_db("select username from members where username not like ? ", ['rootadmin'])
-        # Generate Branch Folders Project
-        src = directory + '/master'
-        for member in members:
-            dst = UPLOAD_FOLDER + '/' + project_name + '/branch-' + member['username']
-            shutil.copytree(src,dst)
-            shutil.copystat(src,dst)
-        # EOL
-
-    except:
-        return "TIMEOUT"
-
-    return redirect("http://" + MPOTECH_TESTSERVER_IP +  ":5000")
-
 @app.route('/add_project', methods=['GET','POST'])
 def add_project():
     error = None
@@ -458,18 +437,6 @@ def add_project():
 
             directory = UPLOAD_FOLDER + '/' + project_name
 
-            # Insert details of projects in the database
-            db = get_db()
-            db.text_factory = str
-            created_by = session['username']
-            db.execute("insert into projects (project_name, description, created_by, created_at, project_status) values (?, ?, ?, datetime('now', 'localtime'), ?)",
-                        [project_name, description, created_by, 1])
-            db.commit()
-            db.close()
-            # EOL
-            
-            return add_project_process(project_name, filename, zipname, directory)
-
             try:
                 # Extract the zip file and rename is as 'master' then delete the zipfile
                 if not os.path.isdir(directory):
@@ -493,7 +460,7 @@ def add_project():
                 # EOL
 
             except:
-                return redirect("http://" + MPOTECH_TESTSERVER_IP +  ":5000")
+                return "TIMEOUT"
 
             # Insert details of projects in the database
             db = get_db()
@@ -556,19 +523,24 @@ def update_project():
         project_name = project_name.lower()
         notes = request.form['notes']
 
-        if len(request.files.getlist('files[]')) == 1 and ( not project_name or not notes ):
+        if request.files['files'] and ( not project_name or not notes ):
             return render_template('update_project.html', error="* Some fields are empty!", project_names=project_names)
-        elif len(request.files.getlist('files[]')) > 1 and ( not project_name or not notes ):
-            return render_template('update_project.html', error="* Some fields are empty!", project_names=project_names)
-        elif len(request.files.getlist('files[]')) == 1 and ( project_name or notes ):
+        elif not request.files['files'] and ( project_name or notes ):
             return render_template('update_project.html', error="* No folders/files selected!", project_names=project_names)
-        elif len(request.files.getlist('files[]')) > 1 and project_name and notes:
+        elif request.files['files'] and project_name and notes:
             if not projectNameValidation(project_name):
                 return render_template('update_project.html', error="* Invalid Project Name!", project_names=project_names)
 
             query = query_db('select * from projects where project_name = ? and project_status = 0', [project_name])
             if query:
                 return render_template('update_project.html', error="* Update not allowed, project " + project_name.upper() + " has been disabled!", project_names=project_names)
+
+            files = request.files['files']
+            filename = secure_filename(files.filename)
+            files.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            zipname = files.filename.split('.')[0]
+
+            directory = UPLOAD_FOLDER + '/' + project_name
 
             src = UPLOAD_FOLDER + '/' + project_name + '/branch-' + username
             dst = '/var/www/qqdewa.test/DATA_BACKUP/' + project_name + '/branch-' + username + '.bak'
@@ -577,11 +549,20 @@ def update_project():
                     shutil.rmtree(dst)
                 shutil.copytree(src, dst)
                 shutil.copystat(src, dst)
-            except:
-                return "ERROR python 'shutil' module"
 
-            if os.path.isdir(src):
-                shutil.rmtree(src)
+                if os.path.isdir(src):
+                    shutil.rmtree(src)
+
+                os.chdir(UPLOAD_FOLDER)
+                command = "unzip " + filename + " -d " + directory + "/"
+                os.system(command)
+                command = "mv " + directory + "/" + zipname + " " + src
+                os.system(command)
+                command = "mv " + UPLOAD_FOLDER + "/" + filename + " " + UPLOAD_FOLDER + "/zipfile/" + project_name + "-branch-" + username + ".zip"
+                os.system(command)
+
+            except:
+                return "TIMEOUT"
 
             """
             files = request.files.getlist('files[]', None)
@@ -622,19 +603,30 @@ def update_project():
                 # EOL
             """
 
-            # Check files or folder that are deleted in the new updates
+            # Check files or folder that are removed/added/updated in the new updates
             files_removed = []
-            _, old_files = dirTree(dst)
+            _, old_files = dirTree(dst, length=1)
+            files_updated = []
+            _, new_files = dirTree(src, length=1)
             for f in old_files:
                 f = re.sub('DATA_BACKUP', 'html', f)
                 f = re.sub('.bak', '', f)
-                if f not in updates_list:
+                if f not in new_files:
                     files_removed.append(f)
+            for f in new_files:
+                _f = re.sub('/html', '/DATA_BACKUP', f)
+                _f = re.sub('branch-'+username, 'branch-'+username+'.bak', _f)
+                f_ = re.sub(UPLOAD_FOLDER, '' ,f)
+                if _f not in old_files:
+                    files_updated.append(f_)
+                if os.path.exists(_f):
+                    if not filecmp.cmp(f, _f):
+                        files_updated.append(f_)
             # EOL
 
-            files_update = ';'.join(files_update_list) + '|' + ';'.join(files_removed)
+            files_update = ';'.join(files_updated) + '|' + ';'.join(files_removed)
             # Update 'activity' table
-            if files_update_list or files_removed:
+            if files_updated or files_removed:
                 db = get_db()
                 db.text_factory = str
                 db.execute("update activity set revert_status = 1 where project_name = ? and updated_by = ?", [project_name, username])
@@ -673,7 +665,7 @@ def project_details(name=None):
         if not details:
             return redirect(url_for('main_page'))
 
-        dirs, files = dirTree(UPLOAD_FOLDER + '/' + project_name + '/master')
+        dirs, files = dirTree(UPLOAD_FOLDER + '/' + project_name + '/master', length=1)
         for i in range(len(dirs)):
             dirs[i] = re.sub(UPLOAD_FOLDER,'',dirs[i])
         for i in range(len(files)):
