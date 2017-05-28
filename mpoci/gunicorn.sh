@@ -16,8 +16,10 @@ test -d $RUNDIR || mkdir -p $RUNDIR
 # Start your gunicorn
 exec gunicorn hello:app -b 0.0.0.0:8080 \
   --name $NAME \
+
   --workers $NUM_WORKERS \
-  --user=$USER --group=$GROUP --timeout 3600 --limit-request-line 0 --limit-request-field_size 0 \
+  --user=$USER --group=$GROUP \
+  --timeout 3600 --graceful-timeout 600 --limit-request-line 0 --limit-request-field_size 0 \
   --bind=unix:$SOCKFILE
 
     Contact GitHub API Training Shop Blog About

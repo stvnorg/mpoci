@@ -819,7 +819,7 @@ def merge():
         if not query:
             return redirect(url_for('main_page'))
         project_name = query['project_name']
-        branch_name = 'branch-' + query['updated_by']
+        branch_name = 'branch-' + username
         master_path = UPLOAD_FOLDER + '/' + project_name + '/master'
         branch_path = UPLOAD_FOLDER + '/' + project_name + '/' + branch_name
         try:
@@ -884,7 +884,7 @@ def download():
             try:
                 downloadPath = UPLOAD_FOLDER + '/' + project_name + '/' + section + '/*'
                 downloadURL = UPLOAD_FOLDER + '/' + project_name + '/' + section
-                command = 'zip ' + downloadURL + ' ' + downloadPath
+                command = 'zip -r' + downloadURL + ' ' + downloadPath
                 dirpath = UPLOAD_FOLDER + '/' + project_name
                 os.chdir(dirpath)
                 os.system('zip ' + project_name + '-' + section + ' ' + section + '/*')
