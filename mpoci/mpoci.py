@@ -460,7 +460,7 @@ def add_project():
                 # EOL
 
             except:
-                return "TIMEOUT"
+                return "TIMEOUT, either the file uploaded is not a 'zip' file or other error"
 
             # Insert details of projects in the database
             db = get_db()
@@ -562,7 +562,7 @@ def update_project():
                 os.system(command)
 
             except:
-                return "TIMEOUT"
+                return "TIMEOUT, either the file uploaded is not a 'zip' file or other error"
 
             """
             files = request.files.getlist('files[]', None)
@@ -882,19 +882,19 @@ def download():
         section = request.args.get('section')
         if project_name and section:
             try:
-                downloadPath = UPLOAD_FOLDER + '/' + project_name + '/' + section + '/*'
-                downloadURL = UPLOAD_FOLDER + '/' + project_name + '/' + section
-                command = 'zip -r' + downloadURL + ' ' + downloadPath
+                zipfilename = project_name + '-' + section + '.zip'
+                if os.path.exists(UPLOAD_FOLDER + '/zipfile/' + zipfilename):
+                    return redirect('http://' + MPOTECH_TESTSERVER_IP + '/zipfile/' + zipfilename)
                 dirpath = UPLOAD_FOLDER + '/' + project_name
                 os.chdir(dirpath)
-                os.system('zip ' + project_name + '-' + section + ' ' + section + '/*')
-                return redirect('http://' + MPOTECH_TESTSERVER_IP + '/' + project_name + '/' + section + '.zip')
+                os.system('zip -r ' + project_name + '-' + section + ' ' + section + '/*')
+                os.system('mv ' + zipfilename + ' ' + UPLOAD_FOLDER + '/zipfile/')
+                return redirect('http://' + MPOTECH_TESTSERVER_IP + '/zipfile/' + zipfilename)
             except Exception as e:
-                return e
-                #return "Download Error!"
+                return "Download Error!"
     else:
         return redirect(url_for('main_page'))
-    return redirect('http://' + MPOTECH_TESTSERVER_IP + '/4dmaster/master.zip')
+    return redirect('http://' + MPOTECH_TESTSERVER_IP + ':5000')
 
 """
 @app.route('/revert_updates', methods=['GET','POST'])
